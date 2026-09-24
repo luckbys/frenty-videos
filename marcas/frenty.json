@@ -1,0 +1,30 @@
+{
+  "id": "frenty",
+  "nome": "Frenty",
+  "slogan": "Gestão completa e inteligente em um único sistema",
+  "site": "frenty.com.br",
+  "assistente": "IAF",
+  "logo": {
+    "texto": "frenty",
+    "simbolo": true
+  },
+  "cores": {
+    "primaria": "#6C5CE7",
+    "destaque": "#00D26A",
+    "secundaria": "#00A8FF",
+    "fundo": "#F8F9FA",
+    "texto": "#2D3436",
+    "fundoEscuro": "#241C5C"
+  },
+  "fontes": {
+    "titulos": "Plus Jakarta Sans",
+    "texto": "Plus Jakarta Sans",
+    "logo": "Nunito"
+  },
+  "estilo": {
+    "arredondamento": "suave",
+    "marcaDagua": true,
+    "barraProgresso": true,
+    "particulas": true
+  }
+}

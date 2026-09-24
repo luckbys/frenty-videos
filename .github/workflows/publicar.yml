@@ -1,0 +1,61 @@
+# Publica uma versão nova: ao enviar uma tag v<versão> (ex.: v1.3.1), gera o instalador num Windows,
+# cria o latest.json e publica os dois em Releases. O programa instalado vê a versão nova sozinho.
+name: Publicar versão
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Conferir versão da tag
+        run: |
+          V=$(node -p "require('./package.json').version")
+          [ "v$V" = "$GITHUB_REF_NAME" ] || { echo "A tag $GITHUB_REF_NAME não bate com a versão $V do package.json"; exit 1; }
+          echo "VERSAO=$V" >> "$GITHUB_ENV"
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Verificar tipos
+        run: npx tsc --noEmit
+
+      - name: NSIS
+        run: |
+          command -v makensis || [ -x "/c/Program Files (x86)/NSIS/makensis.exe" ] || choco install nsis -y --no-progress
+          echo "C:\Program Files (x86)\NSIS" >> "$GITHUB_PATH"
+
+      - name: Gerar instalador
+        run: |
+          echo "WINBUILD=$(cygpath -m "$RUNNER_TEMP")/winbuild" >> "$GITHUB_ENV"
+          WINBUILD="$(cygpath -m "$RUNNER_TEMP")/winbuild" bash scripts/empacotar-windows.sh
+
+      - name: Gerar latest.json
+        run: |
+          EXE="$WINBUILD/dist/FrentyVideos-Setup-$VERSAO.exe"
+          cp "$EXE" .
+          node scripts/manifesto.mjs "FrentyVideos-Setup-$VERSAO.exe" \
+            "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/FrentyVideos-Setup-$VERSAO.exe" latest.json
+
+      - name: Publicar em Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Frenty Vídeos ${{ env.VERSAO }}
+          files: |
+            FrentyVideos-Setup-${{ env.VERSAO }}.exe
+            latest.json

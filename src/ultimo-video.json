@@ -1,0 +1,122 @@
+{
+  "format": "vertical",
+  "sfx": true,
+  "scenes": [
+    {
+      "type": "statement",
+      "kicker": "Black Friday",
+      "text": "**30% off** no plano anual",
+      "surface": "cor",
+      "tint": "destaque",
+      "frames": 105
+    },
+    {
+      "type": "compare",
+      "title": "Seu estoque **no controle**",
+      "before": {
+        "label": "Na planilha",
+        "items": [
+          "Ruptura descoberta tarde",
+          "Pedido no **chute**",
+          "Venda perdida"
+        ]
+      },
+      "after": {
+        "label": "Com a IAF",
+        "items": [
+          "Demanda **prevista**",
+          "Reposição automática",
+          "Gôndola cheia"
+        ]
+      },
+      "surface": "claro",
+      "frames": 240
+    },
+    {
+      "type": "steps",
+      "title": "Comece em **3 passos**",
+      "items": [
+        {
+          "title": "Crie a conta",
+          "icon": "users"
+        },
+        {
+          "title": "Conecte o PDV",
+          "icon": "store"
+        },
+        {
+          "title": "Receba **previsões**",
+          "text": "já no dia seguinte",
+          "icon": "spark"
+        }
+      ],
+      "surface": "escuro",
+      "tint": "destaque",
+      "frames": 210
+    },
+    {
+      "type": "bignumber",
+      "value": "-40%",
+      "label": "de **rupturas** em 2 meses",
+      "context": "Loja Bom Preço",
+      "trend": "desce",
+      "icon": "box",
+      "surface": "claro",
+      "tint": "secundaria",
+      "frames": 150
+    },
+    {
+      "type": "testimonial",
+      "quote": "Parei de **perder venda** no fim de semana.",
+      "author": "Maria Souza",
+      "role": "Dona da Loja Bom Preço",
+      "surface": "escuro",
+      "tint": "primaria",
+      "frames": 210
+    },
+    {
+      "type": "cta",
+      "title": "Oferta até **30/11**",
+      "body": "Plano anual com 30% de desconto",
+      "button": "Garantir desconto",
+      "url": "frenty.com.br/black",
+      "frames": 150
+    },
+    {
+      "type": "outro",
+      "frames": 120
+    }
+  ],
+  "icons": [],
+  "rhythm": "energico",
+  "brand": {
+    "id": "frenty",
+    "nome": "Frenty",
+    "slogan": "Gestão completa e inteligente em um único sistema",
+    "site": "frenty.com.br",
+    "assistente": "IAF",
+    "logo": {
+      "texto": "frenty",
+      "simbolo": true
+    },
+    "cores": {
+      "primaria": "#6C5CE7",
+      "destaque": "#00D26A",
+      "secundaria": "#00A8FF",
+      "fundo": "#F8F9FA",
+      "texto": "#2D3436",
+      "fundoEscuro": "#241C5C"
+    },
+    "fontes": {
+      "titulos": "Plus Jakarta Sans",
+      "texto": "Plus Jakarta Sans",
+      "logo": "Nunito"
+    },
+    "estilo": {
+      "arredondamento": "suave",
+      "marcaDagua": true,
+      "barraProgresso": true,
+      "particulas": true
+    }
+  }
+}

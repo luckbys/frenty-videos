@@ -1,0 +1,30 @@
+{
+  "appId": "br.com.frenty.videos",
+  "productName": "Frenty Videos",
+  "executableName": "FrentyVideos",
+  "directories": { "app": "app", "output": "dist", "buildResources": "app/build" },
+  "electronVersion": "44.4.5",
+  "electronDist": "electron-dist",
+  "asar": false,
+  "npmRebuild": false,
+  "nodeGypRebuild": false,
+  "files": ["**/*", "!**/*.map", "!node_modules/**/*.md", "!node_modules/**/test/**"],
+  "extraResources": [{ "from": "chrome/chrome-headless-shell-win64", "to": "browser" }],
+  "win": {
+    "target": [{ "target": "nsis", "arch": ["x64"] }],
+    "icon": "app/build/icon.ico",
+    "signAndEditExecutable": true, "signtoolOptions": { "sign": null }
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": "always",
+    "createStartMenuShortcut": true,
+    "shortcutName": "Frenty Vídeos",
+    "installerIcon": "app/build/icon.ico",
+    "uninstallerIcon": "app/build/icon.ico",
+    "artifactName": "FrentyVideos-Setup-${version}.exe",
+    "language": "1046"
+  }
+}

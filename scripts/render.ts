@@ -1,9 +1,11 @@
 // Uso: npm run render -- caminho/do/arquivo.md [saida.mp4] [--marca marcas/minha.json]
 //      npm run render -- arquivo.md --ia [--refazer] [--pedido "mais dinâmico, foque nos números"]
+//      npm run render -- arquivo.md --ia --provedor groq [--modelo qwen/qwen3.8-27b]
 //      npm run preview -- caminho/do/arquivo.md   (só prepara e abre o Studio)
 // Marca: --marca, depois "marca:" no topo do .md, depois marca.json na raiz do projeto; sem nada, Frenty.
 // IA: com --ia (ou "montagem: ia" no topo do .md) as cenas são montadas pelo Claude e o plano fica salvo em
 // arquivo.plano-ia.json, reaproveitado enquanto o texto do roteiro não mudar. Precisa de ANTHROPIC_API_KEY.
+// Com --provedor groq (ou FRENTY_IA=groq) quem monta é o Groq; precisa de GROQ_API_KEY.
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { spawnSync } from 'node:child_process';
@@ -34,6 +36,8 @@ const brandArg = option('--marca');
 const instruction = option('--pedido');
 const redo = flag('--refazer');
 const aiFlag = flag('--ia');
+const provider = (option('--provedor') ?? process.env.FRENTY_IA ?? 'claude').toLowerCase() === 'groq' ? 'groq' : 'claude';
+const model = option('--modelo') ?? process.env.GROQ_MODEL;
 const [input, outArg] = args;
 
 if (!input) {
@@ -82,6 +86,9 @@ async function loadPlan(): Promise<StoredPlan | null> {
     format: opts.format,
     maxSeconds: opts.maxSeconds,
     instruction,
+    provider,
+    model,
+    apiKey: provider === 'groq' ? process.env.GROQ_API_KEY : undefined,
     previous: instruction && saved ? saved.plano : undefined,
     onProgress: (p) => p.stage !== last && console.log(`IA: ${(last = p.stage)}...`),
   });

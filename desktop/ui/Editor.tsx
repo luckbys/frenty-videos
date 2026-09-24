@@ -7,7 +7,7 @@ import { FrentyVideo } from '../../src/Video';
 import type { AiInfo, BrandList, VideoMeta } from '../api';
 import { sectionAt, setFormat, setFrontmatter } from '../markdown';
 import { slugify } from '../slug';
-import { AiKeyModal, AiPanel } from './AiPanel';
+import { AiPanel, AiSettingsModal } from './AiPanel';
 import { Icon } from './icons';
 import type { ToastFn } from './main';
 import { FORMAT_SHORT, SCENE, sceneTitle, seconds, SNIPPETS, STATUS } from './util';
@@ -79,6 +79,7 @@ export const Editor: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [ai, setAi] = useState<AiInfo | undefined>();
   const [planRev, setPlanRev] = useState(0);
+  const [aiRev, setAiRev] = useState(0);
   const [keyModal, setKeyModal] = useState<null | (() => void)>(null);
   const [saveState, setSaveState] = useState<'salvo' | 'pendente' | 'salvando'>('salvo');
   const [tab, setTab] = useState<'previa' | 'video'>(meta.videoUrl && meta.status === 'pronto' ? 'video' : 'previa');
@@ -139,7 +140,8 @@ export const Editor: React.FC<{
   // Montagem com IA do vídeo inteiro (scene indefinida) ou de uma cena do plano.
   const runAi = useCallback(
     async (opts: { instruction?: string; scene?: number } = {}) => {
-      if (!(await api.aiKeyStatus()).configured) {
+      const cfg = await api.aiSettings();
+      if (!cfg.keys[cfg.provider].configured) {
         setKeyModal(() => () => void runAi(opts));
         return;
       }
@@ -321,7 +323,7 @@ export const Editor: React.FC<{
               run: async () => (await api.exportVideo(meta.id)) && toast({ tone: 'positive', text: 'Cópia do vídeo salva.' }),
             },
             { label: 'Mostrar na pasta', icon: 'folder', run: () => void api.showInFolder(meta.id) },
-            { label: 'Chave da API do Claude…', icon: 'sparkle', run: () => setKeyModal(() => () => undefined) },
+            { label: 'IA da montagem (Claude ou Groq)…', icon: 'sparkle', run: () => setKeyModal(() => () => undefined) },
             { label: 'Excluir vídeo', icon: 'trash', run: onRemove, danger: true },
           ]}
         />
@@ -447,6 +449,8 @@ export const Editor: React.FC<{
                 }}
                 onCancel={() => void api.aiCancel(meta.id)}
                 onDisable={() => md != null && update(setFrontmatter(md, 'montagem', undefined))}
+                onSettings={() => setKeyModal(() => () => undefined)}
+                settingsRev={aiRev}
               />
             </>
           ) : (
@@ -478,10 +482,11 @@ export const Editor: React.FC<{
         </section>
       </div>
       {keyModal && (
-        <AiKeyModal
+        <AiSettingsModal
           onClose={(saved) => {
             const then = keyModal;
             setKeyModal(null);
+            if (saved) setAiRev((n) => n + 1);
             if (saved) then();
           }}
         />

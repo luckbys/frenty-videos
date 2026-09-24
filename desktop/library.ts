@@ -52,6 +52,7 @@ const aiInfo = (markdown: string, plan: StoredPlan | null, origin?: number[]): A
     summary: plan?.plano.resumo,
     instruction: plan?.instrucao,
     generatedAt: plan?.geradoEm,
+    model: plan?.modelo,
     origin,
   };
 };

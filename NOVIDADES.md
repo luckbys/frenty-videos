@@ -3,6 +3,11 @@
 Cada versão publicada mostra, na janela "Nova versão disponível", os itens da sua seção abaixo.
 Escreva uma seção `## <versão>` com uma linha `- ` por novidade antes de publicar.
 
+## 1.4.0
+
+- Montagem com IA pelo Groq, além do Claude: escolha em "IA da montagem" (modelo padrão qwen/qwen3.8-27b).
+- Cada IA guarda a sua chave; dá para alternar sem digitar de novo.
+
 ## 1.3.0
 
 - O programa agora procura versões novas sozinho e oferece a atualização com um clique.

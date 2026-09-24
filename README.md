@@ -56,7 +56,7 @@ Cada vídeo é uma pasta com `roteiro.md`, o `.mp4` gerado e a miniatura. As mar
 
 ## Montagem com IA
 
-A IA (Claude, da Anthropic) lê o roteiro e decide cena a cena como contar a história: qual componente
+A IA lê o roteiro e decide cena a cena como contar a história: qual componente
 usar, o texto que aparece na tela, os ícones (escolhe entre ~50 ou desenha um novo), o fundo de cada
 cena (claro, escuro ou a cor da marca) e o ritmo das transições. O roteiro pode ser um texto livre,
 sem `##` nem listas. A IA só usa fatos que estão no roteiro: não inventa números, clientes ou depoimentos.
@@ -73,9 +73,15 @@ No app:
   uma cena na linha do tempo e use *Refazer cena*
 - *Usar montagem automática* volta às regras do roteiro (o plano da IA fica guardado)
 
-A primeira vez, o app pede uma **chave da API do Claude** (crie em console.anthropic.com). Ela fica guardada
-só no computador, criptografada pelo sistema; o uso é cobrado na conta da Anthropic dona da chave. Também
-vale a variável de ambiente `ANTHROPIC_API_KEY`. É preciso internet só para montar; gerar o MP4 continua offline.
+Duas IAs podem montar os vídeos, escolhidas em **⋯ → IA da montagem** no editor (ou no link "IA: …" do painel):
+
+- **Claude** (Anthropic, `claude-opus-5`): as melhores escolhas de cena; mais lento e mais caro.
+  Chave em console.anthropic.com ou variável `ANTHROPIC_API_KEY`.
+- **Groq** com um modelo aberto, por padrão `qwen/qwen3.8-27b` (o nome do modelo é editável na mesma janela):
+  muito rápido e barato. Chave em console.groq.com ou variável `GROQ_API_KEY`.
+
+A primeira vez, o app pede a chave da IA escolhida. Ela fica guardada só no computador, criptografada pelo
+sistema; o uso é cobrado na conta dona da chave. Cada IA tem sua chave, então dá para alternar sem digitar de novo. É preciso internet só para montar; gerar o MP4 continua offline.
 
 O plano da IA é salvo junto do vídeo (`plano-ia.json`) e só muda quando você pede. Se o texto mudar depois,
 o app avisa e oferece *Atualizar com IA*. No roteiro, a montagem com IA fica ligada por `montagem: ia` no topo.
@@ -112,6 +118,8 @@ npm run render -- exemplos/briefing-livre-ia.md --ia
 # o plano fica em exemplos/briefing-livre-ia.plano-ia.json e é reaproveitado enquanto o texto não mudar
 npm run render -- exemplos/briefing-livre-ia.md --ia --pedido "mais curto, destaque o desconto"
 npm run render -- exemplos/briefing-livre-ia.md --ia --refazer   # monta do zero
+# com o Groq (precisa de GROQ_API_KEY); --modelo troca o modelo padrão qwen/qwen3.8-27b
+npm run render -- exemplos/briefing-livre-ia.md --ia --refazer --provedor groq
 ```
 
 Pré-visualizar e ajustar no navegador (Remotion Studio):
@@ -200,7 +208,7 @@ Configurações técnicas (fps, limite de 90 s, duração das transições) fica
 - `src/brand.tsx` — perfil de marca, paleta derivada (contraste, tons) e `useBrand()` usado pelas cenas
 - `src/brand-file.ts` — leitura de perfis `.json` e logos do disco
 - `src/parse.ts` — lê o .md e monta as cenas, aplica o limite de 90s
-- `src/ai/` — montagem com IA: `director.ts` (pedido ao Claude) e `plan.ts` (esquema do plano e validação)
+- `src/ai/` — montagem com IA: `director.ts` (pedido ao Claude ou ao Groq, `groq.ts`) e `plan.ts` (esquema do plano e validação)
 - `src/spec.ts` — junta roteiro e plano da IA na especificação do vídeo
 - `src/scenes/` — as 8 cenas do roteiro, `Smart.tsx` (etapas, antes e depois, número, ícones, impacto, depoimento) e `Composition.tsx` (composição livre)
 - `src/motion/` — linguagem de movimento: curvas, tipografia cinética, fundo, transições, sons

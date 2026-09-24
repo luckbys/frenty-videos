@@ -29,6 +29,7 @@ export type AiInfo = {
   summary?: string; // explicação da IA
   instruction?: string;
   generatedAt?: string;
+  model?: string; // modelo que montou
   origin?: number[]; // cena do plano de cada cena do vídeo
 };
 
@@ -51,6 +52,10 @@ export type UpdateEvent =
   | { kind: 'error'; message: string };
 
 export type AiKeyStatus = { configured: boolean; source: 'app' | 'ambiente' | null; hint?: string };
+export type AiProvider = 'claude' | 'groq';
+// Qual IA monta os vídeos e as chaves de cada uma (a chave nunca volta para a tela, só o final dela).
+export type AiSettings = { provider: AiProvider; groqModel: string; defaultGroqModel: string; keys: Record<AiProvider, AiKeyStatus> };
+export type AiSettingsPatch = { provider?: AiProvider; groqModel?: string; claudeKey?: string | null; groqKey?: string | null };
 
 export type RenderEvent =
   | { id: string; kind: 'progress'; stage: string; progress: number }
@@ -74,8 +79,8 @@ export type FrentyApi = {
   aiCompose(id: string, opts?: { instruction?: string; scene?: number }): Promise<{ ok: true; markdown: string } | { ok: false; error: string; needsKey?: boolean }>;
   aiCancel(id: string): Promise<void>;
   onAi(cb: (e: AiEvent) => void): () => void;
-  aiKeyStatus(): Promise<AiKeyStatus>;
-  setAiKey(key: string | null): Promise<AiKeyStatus>;
+  aiSettings(): Promise<AiSettings>;
+  setAiSettings(patch: AiSettingsPatch): Promise<AiSettings>;
   openExternal(url: string): Promise<void>;
   updateInfo(): Promise<UpdateInfo>;
   checkUpdate(): Promise<UpdateInfo>;

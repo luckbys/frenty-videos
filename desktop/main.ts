@@ -2,11 +2,11 @@ import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from 'electro
 import { fork, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { composeVideo, planIsStale, recomposeScene } from '../src/ai/director';
+import { composeVideo, GROQ_DEFAULT_MODEL, planIsStale, recomposeScene } from '../src/ai/director';
 import type { Brand } from '../src/brand';
 import { LOGO_EXTENSIONS, logoToDataUrl } from '../src/brand-file';
 import { scriptOptions } from '../src/parse';
-import type { AiEvent, AiKeyStatus, NewVideo, RenderEvent } from './api';
+import type { AiEvent, AiKeyStatus, AiProvider, AiSettings, AiSettingsPatch, NewVideo, RenderEvent } from './api';
 import { Library, parse } from './library';
 import { setFrontmatter } from './markdown';
 import { Updater } from './updater';
@@ -57,7 +57,15 @@ trace(`abrindo versão ${app.getVersion()} (${process.platform} ${process.arch})
 const settingsFile = () => path.join(app.getPath('userData'), 'config.json');
 const defaultRoot = () => path.join(app.getPath('documents'), 'Frenty Vídeos');
 
-type Settings = { libraryRoot?: string; aiKey?: string; aiKeyPlain?: boolean };
+type Settings = {
+  libraryRoot?: string;
+  aiProvider?: AiProvider;
+  groqModel?: string;
+  aiKey?: string; // Claude
+  aiKeyPlain?: boolean;
+  groqKey?: string;
+  groqKeyPlain?: boolean;
+};
 const readSettings = (): Settings => {
   try {
     return JSON.parse(fs.readFileSync(settingsFile(), 'utf8'));
@@ -73,23 +81,41 @@ const writeSettings = (patch: Partial<Settings>) => {
 };
 const loadRoot = () => readSettings().libraryRoot || defaultRoot();
 
-// Chave da API do Claude: guardada só neste computador, criptografada pelo sistema quando possível.
-const storedKey = () => {
+// Chaves das APIs de IA: guardadas só neste computador, criptografadas pelo sistema quando possível.
+const KEY_FIELD = { claude: 'aiKey', groq: 'groqKey' } as const;
+const ENV_KEY = { claude: 'ANTHROPIC_API_KEY', groq: 'GROQ_API_KEY' } as const;
+const storedKey = (p: AiProvider) => {
   const s = readSettings();
-  if (!s.aiKey) return undefined;
+  const v = s[KEY_FIELD[p]];
+  if (!v) return undefined;
   try {
-    return s.aiKeyPlain ? s.aiKey : safeStorage.decryptString(Buffer.from(s.aiKey, 'base64'));
+    return s[`${KEY_FIELD[p]}Plain`] ? v : safeStorage.decryptString(Buffer.from(v, 'base64'));
   } catch {
     return undefined;
   }
 };
-const apiKey = () => storedKey() || process.env.ANTHROPIC_API_KEY || undefined;
-const keyStatus = (): AiKeyStatus => {
-  const k = storedKey();
+const saveKey = (p: AiProvider, key: string | null) => {
+  const k = key?.trim();
+  const f = KEY_FIELD[p];
+  if (!k) writeSettings({ [f]: undefined, [`${f}Plain`]: undefined });
+  else if (safeStorage.isEncryptionAvailable()) writeSettings({ [f]: safeStorage.encryptString(k).toString('base64'), [`${f}Plain`]: undefined });
+  else writeSettings({ [f]: k, [`${f}Plain`]: true });
+};
+const provider = (): AiProvider => (readSettings().aiProvider === 'groq' ? 'groq' : 'claude');
+const apiKey = (p = provider()) => storedKey(p) || process.env[ENV_KEY[p]] || undefined;
+const keyStatus = (p: AiProvider): AiKeyStatus => {
+  const k = storedKey(p);
   if (k) return { configured: true, source: 'app', hint: `…${k.slice(-4)}` };
-  if (process.env.ANTHROPIC_API_KEY) return { configured: true, source: 'ambiente', hint: `…${process.env.ANTHROPIC_API_KEY.slice(-4)}` };
+  const env = process.env[ENV_KEY[p]];
+  if (env) return { configured: true, source: 'ambiente', hint: `…${env.slice(-4)}` };
   return { configured: false, source: null };
 };
+const aiSettings = (): AiSettings => ({
+  provider: provider(),
+  groqModel: readSettings().groqModel || GROQ_DEFAULT_MODEL,
+  defaultGroqModel: GROQ_DEFAULT_MODEL,
+  keys: { claude: keyStatus('claude'), groq: keyStatus('groq') },
+});
 
 let win: BrowserWindow | null = null;
 let worker: ChildProcess | null = null;
@@ -184,7 +210,7 @@ function registerIpc() {
     try {
       const md = library.markdown(id);
       const o = scriptOptions(md);
-      const common = { markdown: md, brand: library.brands.resolve(o.marca), format: o.format, maxSeconds: o.maxSeconds, apiKey: apiKey(), signal: ctrl.signal, onProgress };
+      const common = { markdown: md, brand: library.brands.resolve(o.marca), format: o.format, maxSeconds: o.maxSeconds, provider: provider(), model: aiSettings().groqModel, apiKey: apiKey(), signal: ctrl.signal, onProgress };
       const saved = library.plan(id);
       const plan =
         opts.scene != null && saved
@@ -205,16 +231,16 @@ function registerIpc() {
     }
   });
   h('aiCancel', (id: string) => aiJobs.get(id)?.abort());
-  h('aiKeyStatus', keyStatus);
+  h('aiSettings', aiSettings);
   h('updateInfo', () => updater.info());
   h('checkUpdate', () => updater.check(true));
   h('installUpdate', () => updater.install());
-  h('setAiKey', (key: string | null) => {
-    const k = key?.trim();
-    if (!k) writeSettings({ aiKey: undefined, aiKeyPlain: undefined });
-    else if (safeStorage.isEncryptionAvailable()) writeSettings({ aiKey: safeStorage.encryptString(k).toString('base64'), aiKeyPlain: undefined });
-    else writeSettings({ aiKey: k, aiKeyPlain: true });
-    return keyStatus();
+  h('setAiSettings', (p: AiSettingsPatch) => {
+    if (p.provider === 'claude' || p.provider === 'groq') writeSettings({ aiProvider: p.provider });
+    if (p.groqModel !== undefined) writeSettings({ groqModel: p.groqModel.trim() && p.groqModel.trim() !== GROQ_DEFAULT_MODEL ? p.groqModel.trim() : undefined });
+    if (p.claudeKey !== undefined) saveKey('claude', p.claudeKey);
+    if (p.groqKey !== undefined) saveKey('groq', p.groqKey);
+    return aiSettings();
   });
   h('openExternal', (url: string) => (/^https:\/\//.test(url) ? shell.openExternal(url) : undefined));
 

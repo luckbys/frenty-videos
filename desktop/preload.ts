@@ -23,8 +23,8 @@ const api: FrentyApi = {
     ipcRenderer.on('ai:event', fn);
     return () => ipcRenderer.removeListener('ai:event', fn);
   },
-  aiKeyStatus: call('aiKeyStatus'),
-  setAiKey: call('setAiKey'),
+  aiSettings: call('aiSettings'),
+  setAiSettings: call('setAiSettings'),
   openExternal: call('openExternal'),
   updateInfo: call('updateInfo'),
   checkUpdate: call('checkUpdate'),

@@ -1,13 +1,17 @@
 // Diretor de IA: lê o roteiro e a marca e devolve o plano de cenas (componentes, textos, ícones e ritmo).
-// Usa a API do Claude com saída estruturada no formato de ../ai/plan.ts. Só roda no Node (app e linha de comando).
+// Usa a API do Claude ou do Groq, com saída estruturada no formato de ../ai/plan.ts. Só roda no Node (app e linha de comando).
 import Anthropic from '@anthropic-ai/sdk';
 import crypto from 'node:crypto';
 import type { Brand } from '../brand';
 import { ICON_NAMES } from '../components/Icons';
 import { theme, type FormatName } from '../theme';
+import { askGroq, GROQ_DEFAULT_MODEL, GroqError } from './groq';
 import { PLAN_SCHEMA, SCENE_SCHEMA, planToScenes, type Plan, type PlanIcon, type PlanScene, type StoredPlan } from './plan';
 
 export const MODEL = 'claude-opus-5';
+export type Provider = 'claude' | 'groq';
+export const PROVIDER_NAME: Record<Provider, string> = { claude: 'Claude', groq: 'Groq' };
+export { GROQ_DEFAULT_MODEL };
 // Se o modelo principal recusar o pedido, a própria API tenta de novo com o modelo reserva recomendado.
 const BETAS: Anthropic.Beta.AnthropicBeta[] = ['server-side-fallback-2026-07-01'];
 
@@ -25,6 +29,8 @@ type Common = {
   format: FormatName;
   maxSeconds?: number;
   apiKey?: string;
+  provider?: Provider; // padrão: claude
+  model?: string; // só para o Groq (padrão GROQ_DEFAULT_MODEL)
   signal?: AbortSignal;
   onProgress?: (p: Progress) => void;
 };
@@ -106,11 +112,39 @@ const friendly = (e: unknown): Error => {
   return e instanceof Error ? e : new Error(String(e));
 };
 
+const friendlyGroq = (e: unknown, model: string): Error => {
+  if (e instanceof DirectorError) return e;
+  if (e instanceof Error && e.name === 'AbortError') return new DirectorError('Montagem com IA cancelada.');
+  if (e instanceof GroqError) {
+    if (e.message === 'max_tokens') return new DirectorError('O plano ficou grande demais. Encurte o roteiro e tente de novo.');
+    if (e.message === 'resposta incompleta') return new DirectorError('A IA devolveu uma resposta incompleta. Tente de novo.');
+    if (e.status === 401) return new DirectorError('Configure uma chave da API do Groq válida para montar vídeos com IA.');
+    if (e.status === 403) return new DirectorError('A chave da API do Groq não tem permissão para usar este modelo.');
+    if (e.status === 404 || /model.*(not exist|not found|decommissioned)|model_not_found/i.test(e.message))
+      return new DirectorError(`O Groq não encontrou o modelo "${model}". Confira o nome do modelo nas configurações da IA.`);
+    if (e.status === 413) return new DirectorError('O roteiro ficou grande demais para o Groq. Encurte o roteiro ou use o Claude.');
+    if (e.status === 429) return new DirectorError('Limite de uso do Groq atingido. Espere um minuto e tente de novo.');
+    if (e.status >= 500) return new DirectorError('O Groq está instável no momento. Tente de novo em instantes.');
+    return new DirectorError(`O Groq recusou o pedido (${e.status}): ${e.message}`);
+  }
+  if (e instanceof TypeError) return new DirectorError('Sem conexão com o Groq. Verifique a internet e tente de novo.');
+  return e instanceof Error ? e : new Error(String(e));
+};
+
 // Chama o Claude em streaming e devolve o JSON da resposta. Com `schema`, a saída vem garantida no formato;
 // se a API não aceitar o esquema, tenta de novo pedindo só o JSON e valida do nosso lado.
 async function ask(opts: Common & { user: string; schema: Record<string, unknown>; effort: 'low' | 'medium' | 'high' }): Promise<unknown> {
-  const api = client(opts.apiKey);
   const maxSeconds = opts.maxSeconds ?? theme.video.maxSeconds;
+  if (opts.provider === 'groq') {
+    const model = opts.model?.trim() || GROQ_DEFAULT_MODEL;
+    try {
+      opts.onProgress?.({ stage: 'Lendo o roteiro' });
+      return await askGroq({ apiKey: opts.apiKey, model, system: system(opts.brand, opts.format, maxSeconds), user: opts.user, schema: opts.schema, signal: opts.signal, onProgress: opts.onProgress });
+    } catch (e) {
+      throw friendlyGroq(e, model);
+    }
+  }
+  const api = client(opts.apiKey);
   const run = async (structured: boolean, fallback = true): Promise<unknown> => {
     const stream = api.beta.messages.stream(
       {
@@ -173,6 +207,8 @@ async function ask(opts: Common & { user: string; schema: Record<string, unknown
   }
 }
 
+export const modelName = (o: { provider?: Provider; model?: string }) => (o.provider === 'groq' ? o.model?.trim() || GROQ_DEFAULT_MODEL : MODEL);
+
 const brief = (markdown: string) => `ROTEIRO / BRIEFING:\n<roteiro>\n${markdown.trim()}\n</roteiro>`;
 
 export async function composeVideo(opts: Common & { instruction?: string; previous?: Plan }): Promise<StoredPlan> {
@@ -187,7 +223,7 @@ export async function composeVideo(opts: Common & { instruction?: string; previo
   return {
     versao: 1,
     geradoEm: new Date().toISOString(),
-    modelo: MODEL,
+    modelo: modelName(opts),
     formato: opts.format,
     fonte: contentHash(bodyOf(opts.markdown)),
     ...(opts.instruction?.trim() ? { instrucao: opts.instruction.trim() } : {}),
@@ -213,7 +249,7 @@ export async function recomposeScene(opts: Common & { stored: StoredPlan; index:
   const icones = [...(plan.icones ?? []), ...(raw.icones ?? []).filter((n) => !(plan.icones ?? []).some((o) => o.nome === n.nome))];
   const next: Plan = { ...plan, cenas, icones };
   planToScenes(next, { maxSeconds: opts.maxSeconds });
-  return { ...opts.stored, geradoEm: new Date().toISOString(), plano: next };
+  return { ...opts.stored, geradoEm: new Date().toISOString(), modelo: modelName(opts), plano: next };
 }
 
 // Conteúdo do roteiro sem o cabeçalho (mudar formato ou marca não invalida o plano).

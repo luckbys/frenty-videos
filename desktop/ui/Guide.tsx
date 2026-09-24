@@ -25,7 +25,7 @@ export const Guide: React.FC = () => (
     <article className="guide-card plain guide-ai">
       <h3>Montagem com IA</h3>
       <p>
-        Com <strong>Montar com IA</strong>, o Claude lê o roteiro (que pode ser um texto livre, sem ## nem listas) e decide cena a cena o melhor
+        Com <strong>Montar com IA</strong>, a IA escolhida (Claude ou Groq, em <strong>⋯ → IA da montagem</strong>) lê o roteiro (que pode ser um texto livre, sem ## nem listas) e decide cena a cena o melhor
         componente: além dos abaixo, <strong>etapas</strong>, <strong>antes e depois</strong>, <strong>número em destaque</strong>,{' '}
         <strong>grade de ícones</strong>, <strong>frase de impacto</strong>, <strong>depoimento</strong> e <strong>composição livre</strong>. Ele
         também reescreve os textos de tela, escolhe ou desenha ícones, alterna os fundos e define o ritmo das transições. A IA só usa fatos que

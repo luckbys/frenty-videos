@@ -1,6 +1,6 @@
 // Painel da montagem com IA no editor, e a janela para informar a chave da API do Claude.
 import React, { useEffect, useState } from 'react';
-import type { AiInfo, AiKeyStatus } from '../api';
+import type { AiInfo, AiProvider, AiSettings } from '../api';
 import { Icon } from './icons';
 
 const api = window.frenty;
@@ -16,8 +16,17 @@ export const AiPanel: React.FC<{
   onRedoScene: (instruction?: string) => void;
   onCancel: () => void;
   onDisable: () => void;
-}> = ({ ai, stage, sceneLabel, sceneIndex, onCompose, onRedoScene, onCancel, onDisable }) => {
+  onSettings: () => void;
+  settingsRev?: number; // muda quando a escolha da IA é salva
+}> = ({ ai, stage, sceneLabel, sceneIndex, onCompose, onRedoScene, onCancel, onDisable, onSettings, settingsRev }) => {
   const [ask, setAsk] = useState('');
+  const [settings, setSettings] = useState<AiSettings | null>(null);
+  useEffect(() => void api.aiSettings().then(setSettings), [settingsRev]);
+  const using = settings && (
+    <button className="link ai-using" onClick={onSettings} title="Trocar a IA que monta os vídeos">
+      IA: {providerLabel(settings)}
+    </button>
+  );
   if (stage)
     return (
       <div className="ai-panel ai-running">
@@ -46,9 +55,12 @@ export const AiPanel: React.FC<{
               : 'A IA pode escolher os componentes, os textos de tela, os ícones e o ritmo de cada cena conforme o conteúdo.'}
           </span>
         </div>
-        <button className="btn btn-ai" onClick={() => onCompose()}>
-          <Icon name="sparkle" size={16} /> Montar com IA
-        </button>
+        <div className="ai-actions">
+          <button className="btn btn-ai" onClick={() => onCompose()}>
+            <Icon name="sparkle" size={16} /> Montar com IA
+          </button>
+          {using}
+        </div>
       </div>
     );
 
@@ -64,11 +76,12 @@ export const AiPanel: React.FC<{
           <Icon name="sparkle" size={16} />
         </div>
         <div className="ai-text">
-          <strong>Montado pela IA</strong>
+          <strong title={ai.model ? `Montado por ${ai.model}` : undefined}>Montado pela IA</strong>
           <span className="muted" title={ai.summary}>
             {ai.summary}
           </span>
         </div>
+        {using}
         <button className="link" onClick={onDisable} title="Volta a montar as cenas pelas regras do roteiro. O plano da IA fica guardado.">
           Usar montagem automática
         </button>
@@ -114,49 +127,109 @@ export const AiPanel: React.FC<{
   );
 };
 
-export const AiKeyModal: React.FC<{ onClose: (saved: boolean) => void }> = ({ onClose }) => {
-  const [status, setStatus] = useState<AiKeyStatus | null>(null);
+const PROVIDERS: Record<AiProvider, { name: string; about: string; keyUrl: string; placeholder: string; env: string }> = {
+  claude: {
+    name: 'Claude',
+    about: 'Claude, da Anthropic. Faz as melhores escolhas de cena, mas cada montagem é mais lenta e mais cara.',
+    keyUrl: 'https://console.anthropic.com/settings/keys',
+    placeholder: 'sk-ant-…',
+    env: 'ANTHROPIC_API_KEY',
+  },
+  groq: {
+    name: 'Groq',
+    about: 'Modelos abertos, como o Qwen, rodando no Groq. É muito rápido e barato.',
+    keyUrl: 'https://console.groq.com/keys',
+    placeholder: 'gsk_…',
+    env: 'GROQ_API_KEY',
+  },
+};
+
+export const providerLabel = (s: AiSettings) => (s.provider === 'groq' ? `Groq · ${s.groqModel}` : 'Claude');
+
+// Escolha da IA que monta os vídeos (Claude ou Groq) e as chaves de cada uma.
+export const AiSettingsModal: React.FC<{ onClose: (saved: boolean) => void }> = ({ onClose }) => {
+  const [settings, setSettings] = useState<AiSettings | null>(null);
+  const [provider, setProvider] = useState<AiProvider>('claude');
   const [key, setKey] = useState('');
-  useEffect(() => void api.aiKeyStatus().then(setStatus), []);
+  const [model, setModel] = useState('');
+  useEffect(
+    () =>
+      void api.aiSettings().then((s) => {
+        setSettings(s);
+        setProvider(s.provider);
+        setModel(s.groqModel);
+      }),
+    [],
+  );
+  if (!settings) return null;
+  const info = PROVIDERS[provider];
+  const status = settings.keys[provider];
+  const ready = status.configured || !!key.trim();
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!key.trim()) return;
-    await api.setAiKey(key.trim());
+    if (!ready) return;
+    await api.setAiSettings({
+      provider,
+      ...(provider === 'groq' ? { groqModel: model.trim() || settings.defaultGroqModel } : {}),
+      ...(key.trim() ? { [provider === 'groq' ? 'groqKey' : 'claudeKey']: key.trim() } : {}),
+    });
     onClose(true);
   };
   return (
     <div className="modal-backdrop" onMouseDown={() => onClose(false)}>
       <form className="modal" onMouseDown={(e) => e.stopPropagation()} onSubmit={save}>
         <div className="modal-head">
-          <h2>Chave da API do Claude</h2>
+          <h2>IA da montagem</h2>
           <button type="button" className="icon-btn" onClick={() => onClose(false)} aria-label="Fechar">
             <Icon name="x" />
           </button>
         </div>
+        <div className="field">
+          <span>Qual IA monta os vídeos</span>
+          <div className="segmented provider-pick">
+            {(Object.keys(PROVIDERS) as AiProvider[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                className={provider === p ? 'active' : ''}
+                onClick={() => {
+                  setProvider(p);
+                  setKey('');
+                }}
+              >
+                <Icon name="sparkle" size={14} /> {PROVIDERS[p].name}
+                {settings.keys[p].configured && <span className="key-dot" title="Chave configurada" />}
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="muted small" style={{ margin: 0, lineHeight: 1.5 }}>
-          A montagem com IA usa o Claude, da Anthropic. Cole aqui uma chave da API da sua conta. Ela fica guardada só neste computador,
-          criptografada, e o uso é cobrado na conta da Anthropic dona da chave.
+          {info.about} A chave fica guardada só neste computador, criptografada, e o uso é cobrado na conta dona da chave.
         </p>
-        {status?.configured && (
+        {provider === 'groq' && (
+          <label className="field">
+            <span>Modelo</span>
+            <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={settings.defaultGroqModel} spellCheck={false} />
+          </label>
+        )}
+        {status.configured && (
           <div className="notice notice-ok">
-            <Icon name="check" size={16} /> Chave {status.source === 'ambiente' ? 'do sistema (ANTHROPIC_API_KEY)' : 'salva'} terminada em {status.hint}
+            <Icon name="check" size={16} /> Chave do {info.name} {status.source === 'ambiente' ? `do sistema (${info.env})` : 'salva'} terminada em {status.hint}
           </div>
         )}
         <label className="field">
-          <span>{status?.configured ? 'Trocar chave' : 'Chave'}</span>
-          <input autoFocus type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="sk-ant-…" spellCheck={false} />
+          <span>{status.configured ? `Trocar chave do ${info.name}` : `Chave da API do ${info.name}`}</span>
+          <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder={info.placeholder} spellCheck={false} />
         </label>
-        <button type="button" className="link" style={{ alignSelf: 'flex-start' }} onClick={() => api.openExternal('https://console.anthropic.com/settings/keys')}>
-          Criar uma chave no console da Anthropic
+        <button type="button" className="link" style={{ alignSelf: 'flex-start' }} onClick={() => api.openExternal(info.keyUrl)}>
+          Criar uma chave no console do {info.name}
         </button>
         <div className="modal-actions">
-          {status?.source === 'app' && (
+          {status.source === 'app' && (
             <button
               type="button"
               className="btn btn-ghost danger-text"
-              onClick={async () => {
-                setStatus(await api.setAiKey(null));
-              }}
+              onClick={async () => setSettings(await api.setAiSettings({ [provider === 'groq' ? 'groqKey' : 'claudeKey']: null }))}
             >
               Remover chave
             </button>
@@ -165,8 +238,8 @@ export const AiKeyModal: React.FC<{ onClose: (saved: boolean) => void }> = ({ on
           <button type="button" className="btn btn-ghost" onClick={() => onClose(false)}>
             Cancelar
           </button>
-          <button type="submit" className="btn btn-primary" disabled={!key.trim()}>
-            Salvar chave
+          <button type="submit" className="btn btn-primary" disabled={!ready}>
+            Salvar
           </button>
         </div>
       </form>

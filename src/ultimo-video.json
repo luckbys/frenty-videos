@@ -1,94 +1,608 @@
 {
-  "format": "vertical",
+  "format": "horizontal",
   "sfx": true,
   "scenes": [
     {
-      "type": "statement",
-      "kicker": "Black Friday",
-      "text": "**30% off** no plano anual",
-      "surface": "cor",
-      "tint": "destaque",
-      "frames": 105
+      "type": "intro",
+      "title": "Seu ERP, **com IA de verdade**",
+      "subtitle": "Veja o Frenty em ação",
+      "frames": 120
     },
     {
-      "type": "compare",
-      "title": "Seu estoque **no controle**",
-      "before": {
-        "label": "Na planilha",
-        "items": [
-          "Ruptura descoberta tarde",
-          "Pedido no **chute**",
-          "Venda perdida"
-        ]
-      },
-      "after": {
-        "label": "Com a IAF",
-        "items": [
-          "Demanda **prevista**",
-          "Reposição automática",
-          "Gôndola cheia"
-        ]
-      },
-      "surface": "claro",
-      "frames": 240
-    },
-    {
-      "type": "steps",
-      "title": "Comece em **3 passos**",
-      "items": [
+      "type": "ui",
+      "title": "Tudo da sua loja **num só painel**",
+      "device": "navegador",
+      "url": "app.frenty.com.br/painel",
+      "screen": "Painel",
+      "menu": [
         {
-          "title": "Crie a conta",
-          "icon": "users"
+          "label": "Painel",
+          "icon": "home"
         },
         {
-          "title": "Conecte o PDV",
-          "icon": "store"
+          "label": "Estoque",
+          "icon": "box"
         },
         {
-          "title": "Receba **previsões**",
-          "text": "já no dia seguinte",
+          "label": "Vendas",
+          "icon": "cart"
+        },
+        {
+          "label": "Financeiro",
+          "icon": "wallet"
+        },
+        {
+          "label": "IAF",
           "icon": "spark"
         }
       ],
-      "surface": "escuro",
-      "tint": "destaque",
-      "frames": 210
-    },
-    {
-      "type": "bignumber",
-      "value": "-40%",
-      "label": "de **rupturas** em 2 meses",
-      "context": "Loja Bom Preço",
-      "trend": "desce",
-      "icon": "box",
+      "blocks": [
+        {
+          "id": "vendas",
+          "kind": "indicador",
+          "w": 3,
+          "h": 1,
+          "title": "Vendas hoje",
+          "text": "vs. ontem",
+          "icon": "coin",
+          "value": "R$ 48.920",
+          "delta": "+12%",
+          "trend": "sobe",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "pedidos",
+          "kind": "indicador",
+          "w": 3,
+          "h": 1,
+          "title": "Pedidos",
+          "text": "vs. ontem",
+          "icon": "receipt",
+          "value": "326",
+          "delta": "+8%",
+          "trend": "sobe",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "ticket",
+          "kind": "indicador",
+          "w": 3,
+          "h": 1,
+          "title": "Ticket médio",
+          "text": "no mês",
+          "icon": "card",
+          "value": "R$ 150,06",
+          "delta": "+3,1%",
+          "trend": "sobe",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "ruptura",
+          "kind": "indicador",
+          "w": 3,
+          "h": 1,
+          "title": "Ruptura",
+          "text": "com a IAF",
+          "icon": "box",
+          "value": "2%",
+          "delta": "-40%",
+          "trend": "desce",
+          "variant": "barras",
+          "status": "ok",
+          "items": [],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "grafico",
+          "kind": "grafico",
+          "w": 8,
+          "h": 2,
+          "title": "Vendas por semana",
+          "text": "Últimas 8 semanas",
+          "icon": "chart",
+          "value": "R$ 1,2 mi",
+          "trend": "neutra",
+          "variant": "area",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "S1",
+              "value": "120",
+              "status": "neutro"
+            },
+            {
+              "label": "S2",
+              "value": "135",
+              "status": "neutro"
+            },
+            {
+              "label": "S3",
+              "value": "128",
+              "status": "neutro"
+            },
+            {
+              "label": "S4",
+              "value": "160",
+              "status": "neutro"
+            },
+            {
+              "label": "S5",
+              "value": "172",
+              "status": "neutro"
+            },
+            {
+              "label": "S6",
+              "value": "168",
+              "status": "neutro"
+            },
+            {
+              "label": "S7",
+              "value": "190",
+              "status": "neutro"
+            },
+            {
+              "label": "S8",
+              "value": "214",
+              "status": "neutro"
+            }
+          ],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "falta",
+          "kind": "lista",
+          "w": 4,
+          "h": 2,
+          "title": "Repor esta semana",
+          "text": "Previsão da IAF",
+          "icon": "box",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "Camiseta básica",
+              "value": "Crítico",
+              "detail": "Acaba em 2 dias",
+              "status": "erro"
+            },
+            {
+              "label": "Tênis casual",
+              "value": "Atenção",
+              "detail": "Acaba em 5 dias",
+              "status": "atencao"
+            },
+            {
+              "label": "Boné aba reta",
+              "value": "OK",
+              "detail": "Estoque para 30 dias",
+              "status": "ok"
+            }
+          ],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "aviso",
+          "kind": "notificacao",
+          "w": 4,
+          "h": 1,
+          "title": "Pedido de reposição criado",
+          "text": "A IAF gerou o pedido de 3 itens.",
+          "icon": "check",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "ok",
+          "items": [],
+          "series": [],
+          "columns": []
+        }
+      ],
+      "actions": [
+        {
+          "target": "grafico",
+          "kind": "zoom"
+        },
+        {
+          "target": "falta",
+          "kind": "clicar"
+        },
+        {
+          "target": "aviso",
+          "kind": "notificar"
+        }
+      ],
       "surface": "claro",
-      "tint": "secundaria",
-      "frames": 150
-    },
-    {
-      "type": "testimonial",
-      "quote": "Parei de **perder venda** no fim de semana.",
-      "author": "Maria Souza",
-      "role": "Dona da Loja Bom Preço",
-      "surface": "escuro",
       "tint": "primaria",
-      "frames": 210
+      "frames": 270
     },
     {
-      "type": "cta",
-      "title": "Oferta até **30/11**",
-      "body": "Plano anual com 30% de desconto",
-      "button": "Garantir desconto",
-      "url": "frenty.com.br/black",
-      "frames": 150
+      "type": "ui",
+      "title": "Pedido de compra em **segundos**",
+      "device": "app",
+      "screen": "Novo pedido",
+      "menu": [
+        {
+          "label": "Painel",
+          "icon": "home"
+        },
+        {
+          "label": "Compras",
+          "icon": "cart"
+        },
+        {
+          "label": "Fornecedores",
+          "icon": "truck"
+        }
+      ],
+      "blocks": [
+        {
+          "id": "form",
+          "kind": "formulario",
+          "w": 7,
+          "h": 3,
+          "title": "Pedido de compra",
+          "text": "Sugestão da IAF pela demanda prevista",
+          "icon": "receipt",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "Fornecedor",
+              "value": "Malharia Sul",
+              "detail": "Escolha o fornecedor",
+              "status": "neutro"
+            },
+            {
+              "label": "Produto",
+              "value": "Camiseta básica",
+              "status": "neutro"
+            },
+            {
+              "label": "Quantidade",
+              "value": "240 unidades",
+              "status": "neutro"
+            }
+          ],
+          "series": [],
+          "columns": [],
+          "button": "Gerar pedido"
+        },
+        {
+          "id": "resumo",
+          "kind": "cartao",
+          "w": 5,
+          "h": 2,
+          "title": "Previsão de demanda",
+          "text": "A IAF calculou a quantidade pelas vendas das últimas 12 semanas.",
+          "icon": "spark",
+          "value": "240 un.",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "prog",
+          "kind": "progresso",
+          "w": 5,
+          "h": 1,
+          "title": "Cobertura do estoque",
+          "icon": "box",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "Hoje",
+              "value": "18%",
+              "status": "erro"
+            },
+            {
+              "label": "Após o pedido",
+              "value": "92%",
+              "status": "ok"
+            }
+          ],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "ok",
+          "kind": "notificacao",
+          "w": 4,
+          "h": 1,
+          "title": "Pedido enviado",
+          "text": "Malharia Sul recebeu o pedido #4821.",
+          "icon": "check",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "ok",
+          "items": [],
+          "series": [],
+          "columns": []
+        }
+      ],
+      "actions": [
+        {
+          "target": "form",
+          "kind": "digitar"
+        },
+        {
+          "target": "form",
+          "kind": "clicar"
+        },
+        {
+          "target": "ok",
+          "kind": "notificar"
+        }
+      ],
+      "surface": "cor",
+      "tint": "destaque",
+      "frames": 270
+    },
+    {
+      "type": "ui",
+      "title": "Pergunte à **IAF**",
+      "device": "celular",
+      "screen": "IAF",
+      "menu": [
+        {
+          "label": "Início",
+          "icon": "home"
+        },
+        {
+          "label": "Vendas",
+          "icon": "cart"
+        },
+        {
+          "label": "IAF",
+          "icon": "spark"
+        },
+        {
+          "label": "Perfil",
+          "icon": "users"
+        }
+      ],
+      "blocks": [
+        {
+          "id": "chat",
+          "kind": "conversa",
+          "w": 12,
+          "h": 4,
+          "title": "IAF",
+          "text": "Assistente da Frenty",
+          "icon": "spark",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "IAF",
+              "value": "Oi! Como posso ajudar hoje?",
+              "status": "neutro"
+            },
+            {
+              "label": "Você",
+              "value": "Quanto vendi esta semana?",
+              "status": "neutro"
+            },
+            {
+              "label": "IAF",
+              "value": "R$ 214 mil, 12% a mais que a semana passada. O tênis casual puxou o crescimento.",
+              "status": "neutro"
+            }
+          ],
+          "series": [],
+          "columns": []
+        }
+      ],
+      "actions": [
+        {
+          "target": "chat",
+          "kind": "digitar"
+        }
+      ],
+      "surface": "escuro",
+      "tint": "secundaria",
+      "frames": 300
+    },
+    {
+      "type": "ui",
+      "device": "navegador",
+      "url": "app.frenty.com.br/estoque",
+      "screen": "Estoque",
+      "menu": [
+        {
+          "label": "Painel",
+          "icon": "home"
+        },
+        {
+          "label": "Estoque",
+          "icon": "box"
+        },
+        {
+          "label": "Vendas",
+          "icon": "cart"
+        }
+      ],
+      "blocks": [
+        {
+          "id": "busca",
+          "kind": "busca",
+          "w": 5,
+          "h": 2,
+          "text": "Buscar produto",
+          "icon": "box",
+          "value": "cami",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "Camiseta básica",
+              "value": "",
+              "detail": "42 un.",
+              "status": "neutro"
+            },
+            {
+              "label": "Camiseta polo",
+              "value": "",
+              "detail": "118 un.",
+              "status": "neutro"
+            },
+            {
+              "label": "Camisa social",
+              "value": "",
+              "detail": "64 un.",
+              "status": "neutro"
+            }
+          ],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "canais",
+          "kind": "grafico",
+          "w": 7,
+          "h": 2,
+          "title": "Vendas por canal",
+          "text": "Este mês",
+          "icon": "chart",
+          "trend": "neutra",
+          "variant": "rosca",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "Loja física",
+              "value": "54%",
+              "status": "neutro"
+            },
+            {
+              "label": "E-commerce",
+              "value": "31%",
+              "status": "neutro"
+            },
+            {
+              "label": "Marketplace",
+              "value": "15%",
+              "status": "neutro"
+            }
+          ],
+          "series": [],
+          "columns": []
+        },
+        {
+          "id": "tab",
+          "kind": "tabela",
+          "w": 12,
+          "h": 2,
+          "title": "Produtos",
+          "icon": "box",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "neutro",
+          "items": [
+            {
+              "label": "Camiseta básica",
+              "value": "42 un.",
+              "detail": "R$ 49,90",
+              "status": "erro"
+            },
+            {
+              "label": "Tênis casual",
+              "value": "87 un.",
+              "detail": "R$ 219,00",
+              "status": "atencao"
+            },
+            {
+              "label": "Boné aba reta",
+              "value": "310 un.",
+              "detail": "R$ 59,90",
+              "status": "ok"
+            }
+          ],
+          "series": [],
+          "columns": [
+            "Produto",
+            "Estoque",
+            "Preço",
+            "Situação"
+          ]
+        },
+        {
+          "id": "alerta",
+          "kind": "alerta",
+          "w": 12,
+          "h": 1,
+          "title": "3 produtos abaixo do mínimo",
+          "text": "A IAF sugere repor antes do fim de semana.",
+          "icon": "alert",
+          "trend": "neutra",
+          "variant": "barras",
+          "status": "atencao",
+          "items": [],
+          "series": [],
+          "columns": [],
+          "button": "Ver sugestão"
+        }
+      ],
+      "actions": [
+        {
+          "target": "busca",
+          "kind": "digitar",
+          "text": "cami"
+        },
+        {
+          "target": "tab",
+          "kind": "destacar"
+        }
+      ],
+      "surface": "claro",
+      "tint": "primaria",
+      "frames": 240
+    },
+    {
+      "type": "statement",
+      "kicker": "Frenty ERP",
+      "text": "Menos planilha, **mais venda**.",
+      "surface": "escuro",
+      "tint": "secundaria",
+      "frames": 120
     },
     {
       "type": "outro",
-      "frames": 120
+      "frames": 135
     }
   ],
   "icons": [],
-  "rhythm": "energico",
+  "rhythm": "equilibrado",
+  "origin": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
   "brand": {
     "id": "frenty",
     "nome": "Frenty",

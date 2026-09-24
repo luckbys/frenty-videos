@@ -3,6 +3,7 @@ import type { Scene } from '../types';
 import { Composition } from './Composition';
 import { Bullets, Chart, Stats } from './Data';
 import { Cta, Quote } from './Engage';
+import { Interface } from './Interface';
 import { Intro, Outro, Text } from './Opening';
 import { BigNumber, Compare, IconGrid, Statement, Steps, Testimonial } from './Smart';
 
@@ -38,5 +39,7 @@ export const SceneView: React.FC<{ scene: Scene }> = ({ scene }) => {
       return <Testimonial {...scene} />;
     case 'composition':
       return <Composition {...scene} />;
+    case 'ui':
+      return <Interface {...scene} />;
   }
 };

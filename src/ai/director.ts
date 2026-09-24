@@ -6,7 +6,7 @@ import type { Brand } from '../brand';
 import { ICON_NAMES } from '../components/Icons';
 import { theme, type FormatName } from '../theme';
 import { askGroq, GROQ_DEFAULT_MODEL, GroqError } from './groq';
-import { PLAN_SCHEMA, SCENE_SCHEMA, planToScenes, type Plan, type PlanIcon, type PlanScene, type StoredPlan } from './plan';
+import { PLAN_SCHEMA, planIssues, SCENE_SCHEMA, planToScenes, type Plan, type PlanIcon, type PlanScene, type StoredPlan } from './plan';
 
 export const MODEL = 'claude-opus-5';
 export type Provider = 'claude' | 'groq';
@@ -37,7 +37,7 @@ type Common = {
 
 const FORMAT_HINT: Record<FormatName, string> = {
   horizontal: 'horizontal 16:9 (1920×1080) — cabe texto em linha; listas e grades de até 3–4 colunas',
-  vertical: 'vertical 9:16 (1080×1920) — para celular: textos BEM curtos, tudo empilhado, no máximo 2 colunas',
+  vertical: 'vertical 9:16 (1080×1920) — para celular: textos BEM curtos, tudo empilhado, no máximo 2 colunas; telas de interface aparecem num celular',
   quadrado: 'quadrado 1:1 (1080×1080) — textos curtos, grades de até 2–3 colunas',
 };
 
@@ -61,12 +61,14 @@ COMPONENTES (campo "tipo"). Escolha o que melhor mostra cada ideia, não o que r
 - conversa: diálogo em balões entre uma pessoa e a assistente ${brand.assistente} (2–4 mensagens). Use quando o roteiro mostra uma pergunta à assistente ou uma interação com o produto.
 - depoimento: citação de um cliente com autor e cargo. SÓ se o roteiro trouxer a citação e o autor.
 - chamada: chamada para ação com botão (e url). Normalmente a penúltima cena.
+- interface: uma TELA DO PRODUTO no estilo de um app moderno (shadcn/ui) dentro de um navegador, janela de programa ou celular, com cursor que clica e digita, zoom da câmera e notificações. É o componente mais forte para MOSTRAR o produto funcionando (painéis, relatórios, cadastros, pedidos, estoque, a conversa com a assistente ${brand.assistente}, alertas). Quando o roteiro fala de um sistema, app, software ou funcionalidade, use de 1 a 3 telas (veja regras abaixo).
 - composicao: layout livre quando nenhum componente pronto serve (veja regras abaixo). Use com moderação (no máximo 2 por vídeo).
 - encerramento: logo, slogan e site. Sempre a última cena (slogan e url vazios = usar os da marca).
 
 REGRAS DE CONTEÚDO
 - Escreva em português do Brasil, no tom da marca: direto, confiante, próximo.
 - Use somente fatos, números, nomes e promessas que estão no roteiro. Nunca invente estatísticas, clientes, depoimentos, preços ou prazos. Se o roteiro não tem números, não use numero_destaque/numeros/grafico.
+- Exceção: DENTRO das telas de interface, os dados de exemplo (nomes de produtos, linhas de tabela, datas, valores de um painel) podem ser ilustrativos e plausíveis para o negócio do roteiro, como numa demonstração. Mesmo assim, número que sustenta uma promessa do vídeo (ganho, economia, resultado) só se estiver no roteiro, e nada de marcas, pessoas ou empresas reais que não estejam nele.
 - Texto de tela é curto: títulos com até ~8 palavras, itens com até ~7 palavras${format === 'vertical' ? ' (no vertical, ainda mais curto)' : ''}. Reescreva e condense o roteiro; não cole parágrafos.
 - Marque com **negrito** 1–2 palavras-chave por texto (elas ganham cor e marca-texto na animação). Não use outro markdown.
 - Se o roteiro pedir um tipo de cena (comentário <!-- tipo: ... -->) ou uma duração (<!-- duracao: ... -->), respeite.
@@ -78,12 +80,38 @@ REGRAS DE DIREÇÃO
 - Varie: não repita o mesmo tipo em cenas seguidas e alterne o fundo (claro, escuro, cor) para dar respiro. "cor" é a cor cheia da marca: use em momentos de impacto, no máximo 1 a cada 3 cenas.
 - "cor" de destaque (primaria, secundaria, destaque) muda o tom de cada cena; varie também.
 - segundos de cada cena: tempo de leitura (~3 palavras por segundo) + 1,5 s de animação; entre 3 e 12 s. A soma deve ficar abaixo de ${maxSeconds} s. Vídeos curtos e ágeis funcionam melhor: prefira menos cenas bem feitas.
+- Prefira mostrar a mostrar-dizer: uma funcionalidade explicada em texto fica melhor como uma tela de interface com uma ação (o usuário clica ou digita → o sistema responde).
 - ritmo: "energico" para lançamentos, promoções e redes sociais; "calmo" para temas institucionais, sensíveis ou explicativos; "equilibrado" no resto.
 - resumo: 1–2 frases para o usuário explicando as escolhas (por que essa estrutura e esses componentes).
 
 ÍCONES
 - Campo "icone": use um destes nomes: ${ICON_NAMES.join(', ')}.
 - Se nenhum representar bem a ideia, crie um ícone em "icones" (no máximo 4 por vídeo): nome em minúsculas-com-hífen (diferente dos nomes acima) e "caminhos" = 1 a 6 atributos "d" de <path> SVG num quadro de 24×24, desenhados como ícone de linha (traço de 2px, sem preenchimento, margem de 2px, formas simples e legíveis em tamanho pequeno). Depois use esse nome no campo "icone".
+
+TELAS DE INTERFACE (tipo interface)
+- moldura: "navegador" (sistema web; endereco = URL curta, ex.: app.${(brand.site || 'empresa.com.br').replace(/^https?:\/\//, '')}/estoque), "app" (programa de computador) ou "celular". ${format === 'vertical' ? 'Neste vídeo vertical toda tela aparece num celular grande: pense em telas de app de celular (blocos empilhados, 1 coluna; indicadores ficam 2 por linha).' : 'No celular os blocos ficam empilhados; use celular para o app de celular ou para a conversa com a assistente.'}
+- tela: nome da tela no topo ("Painel", "Estoque", "Novo pedido"). menu: 3–5 itens da barra lateral (rotulo + icone) com a tela atual entre eles; vazio = sem barra lateral.
+- blocos: 1–6 cartões numa grade de 12 colunas (largura 1–12, altura 1–4 linhas); cada linha da grade soma 12 de largura; no máximo 3 linhas. Exemplo de painel: 4 indicadores de largura 3; um grafico de largura 8 ao lado de uma lista de largura 4. id: curto e único ("vendas", "form"). Tipos de bloco:
+  - indicador: KPI — titulo, valor, variacao ("+12%"), tendencia, texto curto ("vs. ontem"), icone; serie opcional (6–12 números) vira minigráfico.
+  - grafico: variante "barras", "area" ou "rosca"; itens = pontos (rotulo + valor numérico em texto); valor = total opcional no canto.
+  - tabela: colunas (2–4 títulos); itens = linhas (rotulo = 1ª coluna, valor = 2ª, detalhe = 3ª, status = selo).
+  - lista: itens com rotulo, detalhe (linha de baixo) e valor ou status.
+  - formulario: itens = campos (rotulo = nome do campo, valor = o que será preenchido, detalhe = dica); botao.
+  - cartao: icone, titulo, texto, valor opcional, botao opcional.
+  - alerta: aviso com status (atencao, erro ou ok), titulo, texto, botao opcional.
+  - progresso: itens com rotulo e valor em % (status colore a barra).
+  - busca: campo de busca (texto = dica do campo, valor = o que é digitado) e itens = resultados (rotulo, detalhe).
+  - conversa: chat com a assistente — itens com rotulo "Você" ou "${brand.assistente}" e valor = a mensagem.
+  - notificacao: aviso que aparece por cima da tela (titulo, texto, status, icone). Não ocupa lugar na grade.
+  status: ok (verde), atencao (amarelo), erro (vermelho), neutro. Campos que não se aplicam: "" ou [].
+- acoes: o que acontece na tela, em ordem, 1–4 ações (alvo = id do bloco). Conte uma micro-história: o usuário age → o sistema responde.
+  - clicar: clica no botão do bloco (ou na 1ª linha da tabela/lista);
+  - digitar: preenche o formulario campo a campo, digita na busca, ou escreve e envia a mensagem na conversa (texto = mensagem; vazio = a última mensagem de "Você", e as respostas da assistente aparecem depois);
+  - destacar: anel de destaque e leve aproximação no bloco que prova o ponto;
+  - zoom: a câmera aproxima bem do bloco (o número ou gráfico principal);
+  - notificar: mostra uma notificacao (alvo = o id dela), normalmente logo depois de um clicar.
+- titulo: frase curta acima da tela, com **destaque** (ou "" para a tela ocupar o quadro todo). fundo "claro" ou "cor" = tela clara; "escuro" = tela no modo escuro.
+- segundos: 7–12 (as ações precisam de tempo).
 
 COMPOSIÇÃO LIVRE (tipo composicao)
 - A área segura do quadro é uma grade de 12 colunas × 12 linhas; cada elemento ocupa x, y (0–11), largura e altura (em células, sem passar de 12). Pense no formato ${format}: ${format === 'vertical' ? 'as células são altas e estreitas — empilhe de cima para baixo' : format === 'quadrado' ? 'as células são quadradas' : 'as células são largas e baixas — distribua na horizontal'}.
@@ -171,7 +199,8 @@ async function ask(opts: Common & { user: string; schema: Record<string, unknown
         opts.onProgress?.({ stage: 'Pensando na história do vídeo' });
       } else if (ev.type === 'content_block_delta' && ev.delta.type === 'text_delta') {
         chars += ev.delta.text;
-        const scenes = (chars.match(/"tipo"\s*:\s*"(?!titulo|texto|icone|numero|selo|ilustracao|forma")/g) ?? []).length;
+        // Só as cenas têm "segundos" (elementos e blocos de tela também têm "tipo").
+        const scenes = (chars.match(/"segundos"\s*:/g) ?? []).length;
         opts.onProgress?.({ stage: scenes ? `Criando cena ${scenes}` : 'Escolhendo os componentes', scenes });
       }
     }
@@ -216,7 +245,30 @@ export async function composeVideo(opts: Common & { instruction?: string; previo
   if (opts.previous) parts.push(`PLANO ATUAL (ajuste a partir dele, mantendo o que funciona):\n${JSON.stringify(opts.previous)}`);
   if (opts.instruction?.trim()) parts.push(`PEDIDO DO USUÁRIO PARA ESTA MONTAGEM: ${opts.instruction.trim()}`);
   parts.push('Monte o plano completo do vídeo.');
-  const raw = (await ask({ ...opts, user: parts.join('\n\n'), schema: PLAN_SCHEMA, effort: 'medium' })) as Plan;
+  let raw = (await ask({ ...opts, user: parts.join('\n\n'), schema: PLAN_SCHEMA, effort: 'medium' })) as Plan;
+  // Revisão: se algo foi descartado ou não coube, pede uma vez à IA para corrigir (fica com o melhor dos dois).
+  const issues = planIssues(raw, { maxSeconds: opts.maxSeconds });
+  if (issues.length && !opts.signal?.aborted) {
+    opts.onProgress?.({ stage: 'Revisando o plano' });
+    try {
+      const fixed = (await ask({
+        ...opts,
+        onProgress: (p) => opts.onProgress?.({ stage: 'Revisando o plano', scenes: p.scenes }),
+        user: [
+          brief(opts.markdown),
+          `PLANO:\n${JSON.stringify(raw)}`,
+          `A revisão automática encontrou estes problemas:\n- ${issues.join('\n- ')}`,
+          'Corrija só o que for preciso e devolva o plano completo.',
+        ].join('\n\n'),
+        schema: PLAN_SCHEMA,
+        effort: 'low',
+      })) as Plan;
+      if (planIssues(fixed, { maxSeconds: opts.maxSeconds }).length < issues.length) raw = fixed;
+    } catch (e) {
+      if (opts.signal?.aborted) throw e;
+      // Se a revisão falhar, segue com o primeiro plano (os problemas já foram contornados na conversão).
+    }
+  }
   // Valida já aqui: se nada for aproveitável, o erro aparece agora e não na hora de gerar o vídeo.
   planToScenes(raw, { maxSeconds: opts.maxSeconds });
   opts.onProgress?.({ stage: 'Plano pronto', scenes: raw.cenas?.length });

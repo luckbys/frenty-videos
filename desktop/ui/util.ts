@@ -27,6 +27,7 @@ export const SCENE: Record<Scene['type'], { label: string; color: string }> = {
   statement: { label: 'Impacto', color: '#D63384' },
   testimonial: { label: 'Depoimento', color: '#8E7CF0' },
   composition: { label: 'Composição', color: '#F39C12' },
+  ui: { label: 'Tela', color: '#0EA5E9' },
 };
 
 export const seconds = (s: number | null | undefined) =>
@@ -51,6 +52,7 @@ export const sceneTitle = (s: Scene) => {
   if (s.type === 'statement') return plain(s.text);
   if (s.type === 'bignumber') return `${s.value} ${plain(s.label)}`;
   if (s.type === 'testimonial') return s.author;
+  if (s.type === 'ui') return s.screen || SCENE.ui.label;
   if (s.type === 'composition') return plain(s.elements.find((e) => e.kind === 'titulo')?.text ?? SCENE.composition.label);
   return SCENE[s.type].label;
 };

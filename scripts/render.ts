@@ -98,13 +98,13 @@ async function loadPlan(): Promise<StoredPlan | null> {
 }
 
 (async () => {
-  const { source, ...spec } = { ...buildSpec(markdown, await loadPlan()), brand };
+  const { source, ...spec } = { ...buildSpec(markdown, await loadPlan(), aiFlag), brand };
   fs.writeFileSync(path.join(root, 'src/ultimo-video.json'), JSON.stringify(spec, null, 2));
 
   const secs = totalFrames(spec.scenes) / theme.video.fps;
   console.log(`\n${spec.scenes.length} cenas · ${secs.toFixed(1)}s · formato ${spec.format} · marca ${brand.nome} · montagem ${source === 'ia' ? 'IA' : 'automática'}`);
   for (const s of spec.scenes) {
-    const label = 'title' in s && s.title ? s.title : s.type;
+    const label = 'title' in s && s.title ? s.title : s.type === 'ui' && s.screen ? s.screen : s.type;
     console.log(`  - ${s.type.padEnd(11)} ${(s.frames / theme.video.fps).toFixed(1).padStart(5)}s  ${label}`);
   }
 

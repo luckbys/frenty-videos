@@ -27,9 +27,11 @@ export const Guide: React.FC = () => (
       <p>
         Com <strong>Montar com IA</strong>, a IA escolhida (Claude ou Groq, em <strong>⋯ → IA da montagem</strong>) lê o roteiro (que pode ser um texto livre, sem ## nem listas) e decide cena a cena o melhor
         componente: além dos abaixo, <strong>etapas</strong>, <strong>antes e depois</strong>, <strong>número em destaque</strong>,{' '}
-        <strong>grade de ícones</strong>, <strong>frase de impacto</strong>, <strong>depoimento</strong> e <strong>composição livre</strong>. Ele
+        <strong>grade de ícones</strong>, <strong>frase de impacto</strong>, <strong>depoimento</strong>, <strong>composição livre</strong> e{' '}
+        <strong>telas do sistema</strong> (painéis, formulários, tabelas e o chat da IAF no navegador, numa janela ou no celular, com cursor
+        clicando, texto sendo digitado e zoom). Ela
         também reescreve os textos de tela, escolhe ou desenha ícones, alterna os fundos e define o ritmo das transições. A IA só usa fatos que
-        estão no roteiro.
+        estão no roteiro; nas telas, pode completar com dados de exemplo.
       </p>
       <p className="muted small">
         Depois, peça ajustes em texto ("mais curto", "destaque os números") para remontar tudo, ou selecione uma cena na linha do tempo e use

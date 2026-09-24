@@ -23,6 +23,33 @@ export type CompositionElement = {
   order: number;
 };
 
+// Tela de produto (interface no estilo shadcn/ui) montada pela IA: blocos numa grade de 12 colunas
+// e um roteiro de ações (cursor clicando, digitando, destacando, zoom, notificação).
+export type UiStatus = 'ok' | 'atencao' | 'erro' | 'neutro';
+export type UiItem = { label: string; value: string; detail?: string; status?: UiStatus };
+export type UiBlockKind = 'indicador' | 'grafico' | 'tabela' | 'lista' | 'formulario' | 'cartao' | 'alerta' | 'notificacao' | 'conversa' | 'progresso' | 'busca';
+export type UiBlock = {
+  id: string;
+  kind: UiBlockKind;
+  w: number; // colunas (1–12)
+  h: number; // linhas (1–4)
+  title?: string;
+  text?: string;
+  icon: string;
+  value?: string;
+  delta?: string;
+  trend: 'sobe' | 'desce' | 'neutra';
+  variant: 'barras' | 'area' | 'rosca';
+  status: UiStatus;
+  items: UiItem[];
+  series: number[];
+  columns: string[];
+  button?: string;
+};
+export type UiActionKind = 'clicar' | 'digitar' | 'destacar' | 'zoom' | 'notificar';
+export type UiAction = { target: string; kind: UiActionKind; text?: string };
+export type UiFrameKind = 'navegador' | 'app' | 'celular';
+
 export type Scene =
   | { type: 'intro'; title: string; subtitle?: string; frames: number }
   | { type: 'text'; title?: string; body: string; frames: number }
@@ -39,7 +66,20 @@ export type Scene =
   | { type: 'icongrid'; title?: string; items: { icon: string; label: string; text?: string }[]; surface: Surface; tint: Tint; frames: number }
   | { type: 'statement'; kicker?: string; text: string; surface: Surface; tint: Tint; frames: number }
   | { type: 'testimonial'; quote: string; author: string; role?: string; surface: Surface; tint: Tint; frames: number }
-  | { type: 'composition'; elements: CompositionElement[]; surface: Surface; frames: number };
+  | { type: 'composition'; elements: CompositionElement[]; surface: Surface; frames: number }
+  | {
+      type: 'ui';
+      title?: string;
+      device: UiFrameKind;
+      url?: string;
+      screen?: string; // nome da tela no topo do app
+      menu: { label: string; icon: string }[];
+      blocks: UiBlock[];
+      actions: UiAction[];
+      surface: Surface;
+      tint: Tint;
+      frames: number;
+    };
 
 // Ícone desenhado pela IA: traços num quadro de 24×24, como os ícones de linha da marca.
 export type CustomIcon = { name: string; paths: string[] };

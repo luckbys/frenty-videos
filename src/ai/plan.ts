@@ -3,8 +3,9 @@
 // tamanhos de lista, números, ícones e posições são conferidos e ajustados.
 import { ICON_NAMES, iconFor } from '../components/Icons';
 import { fitToLimit } from '../parse';
+import { totalFrames } from '../parse-duration';
 import { theme } from '../theme';
-import type { CompositionElement, CustomIcon, Rhythm, Scene, Surface, Tint } from '../types';
+import type { CompositionElement, CustomIcon, Rhythm, Scene, Surface, Tint, UiAction, UiBlock, UiBlockKind, UiItem, UiStatus } from '../types';
 
 const FPS = theme.video.fps;
 
@@ -25,6 +26,10 @@ const obj = (properties: Record<string, Schema>): Schema => ({
 
 export const FUNDOS = ['claro', 'escuro', 'cor'] as const;
 export const CORES = ['primaria', 'secundaria', 'destaque'] as const;
+
+export const UI_BLOCKS = ['indicador', 'grafico', 'tabela', 'lista', 'formulario', 'cartao', 'alerta', 'notificacao', 'conversa', 'progresso', 'busca'] as const;
+export const UI_ACTIONS = ['clicar', 'digitar', 'destacar', 'zoom', 'notificar'] as const;
+const STATUS = ['ok', 'atencao', 'erro', 'neutro'] as const;
 
 const base = (tipo: string, extra: Record<string, Schema>) =>
   obj({ tipo: { type: 'string', const: tipo }, segundos: num, ...extra });
@@ -74,6 +79,36 @@ const SCENES: Record<string, Schema> = {
         ordem: int,
       }),
     ),
+  }),
+  interface: base('interface', {
+    fundo: en(...FUNDOS),
+    cor: en(...CORES),
+    titulo: str,
+    moldura: en('navegador', 'app', 'celular'),
+    endereco: str,
+    tela: str,
+    menu: arr(obj({ rotulo: str, icone: str })),
+    blocos: arr(
+      obj({
+        id: str,
+        tipo: en(...UI_BLOCKS),
+        largura: int,
+        altura: int,
+        titulo: str,
+        texto: str,
+        icone: str,
+        valor: str,
+        variacao: str,
+        tendencia: en('sobe', 'desce', 'neutra'),
+        variante: en('barras', 'area', 'rosca'),
+        status: en(...STATUS),
+        itens: arr(obj({ rotulo: str, valor: str, detalhe: str, status: en(...STATUS) })),
+        serie: arr(num),
+        colunas: arr(str),
+        botao: str,
+      }),
+    ),
+    acoes: arr(obj({ alvo: str, acao: en(...UI_ACTIONS), texto: str })),
   }),
   encerramento: base('encerramento', { slogan: str, url: str }),
 };
@@ -129,7 +164,39 @@ export type PlanScene =
         ordem: number;
       }>;
     }
+  | {
+      tipo: 'interface';
+      segundos: number;
+      fundo: Surface;
+      cor: Tint;
+      titulo: string;
+      moldura: 'navegador' | 'app' | 'celular';
+      endereco: string;
+      tela: string;
+      menu: Item<{ rotulo: string; icone: string }>;
+      blocos: Item<PlanUiBlock>;
+      acoes: Item<{ alvo: string; acao: (typeof UI_ACTIONS)[number]; texto: string }>;
+    }
   | { tipo: 'encerramento'; segundos: number; slogan: string; url: string };
+
+export type PlanUiBlock = {
+  id: string;
+  tipo: UiBlockKind;
+  largura: number;
+  altura: number;
+  titulo: string;
+  texto: string;
+  icone: string;
+  valor: string;
+  variacao: string;
+  tendencia: 'sobe' | 'desce' | 'neutra';
+  variante: 'barras' | 'area' | 'rosca';
+  status: UiStatus;
+  itens: Item<{ rotulo: string; valor: string; detalhe: string; status: UiStatus }>;
+  serie: number[];
+  colunas: string[];
+  botao: string;
+};
 
 export type PlanIcon = { nome: string; caminhos: string[] };
 export type Plan = { resumo: string; ritmo: Rhythm; icones: PlanIcon[]; cenas: PlanScene[] };
@@ -190,7 +257,11 @@ const iconName = (v: unknown, context: string, custom: Set<string>) => {
 };
 
 // Converte uma cena do plano em cena desenhável; devolve null se estiver vazia demais.
-export function toScene(p: PlanScene, custom: Set<string>): Scene | null {
+// Problemas encontrados na conversão (para pedir à IA que corrija o plano).
+type Report = (msg: string) => void;
+const quiet: Report = () => undefined;
+
+export function toScene(p: PlanScene, custom: Set<string>, report: Report = quiet): Scene | null {
   const surface = pick((p as { fundo?: string }).fundo, FUNDOS, 'claro');
   const tint = pick((p as { cor?: string }).cor, CORES, 'primaria');
   switch (p.tipo) {
@@ -329,12 +400,165 @@ export function toScene(p: PlanScene, custom: Set<string>): Scene | null {
       }
       return elements.some((e) => e.kind !== 'forma') ? { type: 'composition', elements, surface, frames: seconds(p.segundos, 6) } : null;
     }
+    case 'interface':
+      return uiScene(p, custom, surface, tint, report);
     case 'encerramento': {
       const url = text(p.url, 80).replace(/^https?:\/\//, '').replace(/\/$/, '');
       return { type: 'outro', slogan: opt(p.slogan, 120), url: url || undefined, frames: seconds(p.segundos, 4.5) };
     }
   }
   return null;
+}
+
+/* ---------- Tela de interface ---------- */
+
+// Tamanho padrão de cada bloco na grade de 12 colunas (quando a IA manda algo fora do lugar).
+const UI_SIZE: Record<UiBlockKind, [number, number]> = {
+  indicador: [3, 1],
+  grafico: [8, 2],
+  tabela: [12, 2],
+  lista: [6, 2],
+  formulario: [6, 3],
+  cartao: [4, 2],
+  alerta: [12, 1],
+  notificacao: [4, 1],
+  conversa: [6, 3],
+  progresso: [6, 2],
+  busca: [8, 2],
+};
+const UI_MAX_ITEMS: Record<UiBlockKind, number> = {
+  indicador: 0,
+  grafico: 8,
+  tabela: 6,
+  lista: 6,
+  formulario: 4,
+  cartao: 0,
+  alerta: 0,
+  notificacao: 0,
+  conversa: 6,
+  progresso: 5,
+  busca: 5,
+};
+// Em que blocos cada ação faz sentido.
+const ACTION_ON: Record<UiAction['kind'], UiBlockKind[] | null> = {
+  clicar: null,
+  digitar: ['formulario', 'busca', 'conversa'],
+  destacar: null,
+  zoom: null,
+  notificar: ['notificacao'],
+};
+
+function uiScene(p: Extract<PlanScene, { tipo: 'interface' }>, custom: Set<string>, surface: Surface, tint: Tint, report: Report): Scene | null {
+  const ids = new Set<string>();
+  const blocks: UiBlock[] = [];
+  for (const raw of list<PlanUiBlock>(p.blocos, 12)) {
+    if (!raw || typeof raw !== 'object') continue;
+    const kind = pick(raw.tipo, UI_BLOCKS, 'cartao');
+    const max = UI_MAX_ITEMS[kind];
+    const chat = kind === 'conversa';
+    const items: UiItem[] = list<PlanUiBlock['itens'][number]>(raw.itens, max)
+      .filter((i) => text(i?.rotulo) || text(i?.valor))
+      .map((i) => ({
+        label: text(i.rotulo, chat ? 30 : 42),
+        value: text(i.valor, chat ? 170 : 44),
+        detail: opt(i.detalhe, 44),
+        status: i.status && STATUS.includes(i.status) ? i.status : undefined,
+      }));
+    const title = opt(raw.titulo, 48);
+    const value = opt(raw.valor, 26);
+    // Bloco sem nada para mostrar fica de fora.
+    if (!title && !value && !items.length && !text(raw.texto)) {
+      report(`bloco "${text(raw.id, 24)}" (${kind}) está vazio`);
+      continue;
+    }
+    if ((kind === 'tabela' || kind === 'lista' || kind === 'grafico' || kind === 'progresso' || kind === 'formulario') && !items.length && !(kind === 'grafico' && Array.isArray(raw.serie) && raw.serie.length > 1)) {
+      report(`bloco "${text(raw.id, 24)}" (${kind}) precisa de itens`);
+      continue;
+    }
+    let id = text(raw.id, 24).toLowerCase().replace(/[^a-z0-9_-]/g, '') || `b${blocks.length + 1}`;
+    while (ids.has(id)) id += 'x';
+    ids.add(id);
+    const [dw, dh] = UI_SIZE[kind];
+    blocks.push({
+      id,
+      kind,
+      w: clampInt(raw.largura, 2, 12, dw),
+      h: clampInt(raw.altura, 1, 4, dh),
+      title,
+      text: opt(raw.texto, 130),
+      icon: iconName(raw.icone, `${raw.titulo} ${raw.texto}`, custom),
+      value,
+      delta: opt(raw.variacao, 16),
+      trend: pick(raw.tendencia, ['sobe', 'desce', 'neutra'] as const, 'neutra'),
+      variant: pick(raw.variante, ['barras', 'area', 'rosca'] as const, 'barras'),
+      status: pick(raw.status, STATUS, 'neutro'),
+      items,
+      series: list<number>(raw.serie, 24).filter((n) => typeof n === 'number' && Number.isFinite(n)),
+      columns: list<string>(raw.colunas, 4).map((c) => text(c, 24)),
+      button: opt(raw.botao, 28),
+    });
+    if (blocks.filter((b) => b.kind !== 'notificacao').length >= 8) break;
+  }
+  if (!blocks.some((b) => b.kind !== 'notificacao')) return null;
+  const byId = new Map(blocks.map((b) => [b.id, b]));
+  const actions: UiAction[] = [];
+  for (const a of list<{ alvo: string; acao: string; texto: string }>(p.acoes, 6)) {
+    const target = text(a?.alvo, 24).toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const kind = pick(a?.acao, UI_ACTIONS, 'destacar');
+    const b = byId.get(target);
+    if (!b) {
+      report(`ação "${kind}" aponta para o bloco "${target}", que não existe`);
+      continue;
+    }
+    const allowed = ACTION_ON[kind];
+    if ((allowed && !allowed.includes(b.kind)) || (kind !== 'notificar' && b.kind === 'notificacao')) {
+      report(`ação "${kind}" não serve para o bloco "${target}" (${b.kind})`);
+      continue;
+    }
+    actions.push({ target, kind, text: opt(a.texto, 120) });
+  }
+  const url = text(p.endereco, 60).replace(/^https?:\/\//, '').replace(/\/$/, '');
+  return {
+    type: 'ui',
+    title: opt(p.titulo, 90),
+    device: pick(p.moldura, ['navegador', 'app', 'celular'] as const, 'navegador'),
+    url: url || undefined,
+    screen: opt(p.tela, 30),
+    menu: list<{ rotulo: string; icone: string }>(p.menu, 6)
+      .filter((m) => text(m?.rotulo))
+      .map((m) => ({ label: text(m.rotulo, 20), icon: iconName(m.icone, m.rotulo, custom) })),
+    blocks,
+    actions,
+    surface,
+    tint,
+    frames: seconds(p.segundos, 8),
+  };
+}
+
+// Revisão do plano: o que foi descartado ou não cabe. Vazio = plano bom.
+export function planIssues(plan: Plan, opts: PlanOptions = {}): string[] {
+  const issues: string[] = [];
+  const custom = new Set(sanitizeIcons(plan?.icones).map((i) => i.name));
+  const cenas = list<PlanScene>(plan?.cenas, 24);
+  if (!cenas.length) return ['o plano não tem cenas'];
+  const scenes: Scene[] = [];
+  cenas.forEach((p, i) => {
+    const where = `cena ${i + 1}`;
+    if (!p || typeof p !== 'object' || !SCENE_KINDS.includes(p.tipo)) {
+      issues.push(`${where}: tipo "${(p as { tipo?: string })?.tipo}" não existe`);
+      return;
+    }
+    const scene = toScene(p, custom, (m) => issues.push(`${where} (${p.tipo}): ${m}`));
+    if (!scene) issues.push(`${where} (${p.tipo}) ficou vazia: faltam os campos principais`);
+    else scenes.push(scene);
+    if (i > 0 && cenas[i - 1]?.tipo === p.tipo && p.tipo !== 'interface') issues.push(`${where} repete o tipo "${p.tipo}" da cena anterior`);
+  });
+  // Mesma conta do vídeo final: com o encerramento da marca e a sobreposição das transições.
+  if (opts.closing !== false && !scenes.some((s) => s.type === 'outro')) scenes.push({ type: 'outro', frames: Math.round(4.5 * FPS) });
+  const total = totalFrames(scenes) / FPS;
+  const max = opts.maxSeconds ?? theme.video.maxSeconds;
+  if (total > max + 1) issues.push(`o vídeo soma ${Math.round(total)} s e o limite é ${max} s: encurte ou tire cenas`);
+  return issues;
 }
 
 export type PlanOptions = { closing?: boolean; maxSeconds?: number };

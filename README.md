@@ -8,7 +8,7 @@ Cada vídeo tem no máximo **90 segundos**.
 
 Um aplicativo para criar, pré-visualizar e gerenciar os vídeos sem usar o terminal.
 
-- **Windows (recomendado):** rode `FrentyVideos-Setup-1.3.0.exe`. Ele instala o programa com atalho
+- **Windows (recomendado):** rode `FrentyVideos-Setup-1.5.0.exe`. Ele instala o programa com atalho
   na área de trabalho e no menu Iniciar, sem precisar de Node.js nem de internet para gerar vídeos.
   Como o instalador não tem assinatura digital, o Windows pode mostrar "O Windows protegeu o computador":
   clique em **Mais informações** → **Executar assim mesmo**.
@@ -64,6 +64,14 @@ sem `##` nem listas. A IA só usa fatos que estão no roteiro: não inventa núm
 Componentes que ela combina, além das 8 cenas do roteiro: **etapas** (passo a passo), **antes e depois**,
 **número em destaque**, **grade de ícones**, **frase de impacto**, **depoimento** e **composição livre**
 (a IA posiciona títulos, textos, ícones, números e selos numa grade 12×12).
+
+**Telas do sistema**: a IA monta telas de produto no estilo shadcn/ui (cartões, indicadores, gráficos de
+barras/área/rosca, tabelas, listas, formulários, busca, alertas, notificações, progresso e o chat da IAF),
+dentro de um navegador, de uma janela de app ou de um celular (no vídeo vertical, sempre no celular).
+A tela entra em 3D e ganha vida com motion design: blocos em cascata, números contando, cursor que clica,
+texto sendo digitado, câmera que dá zoom num bloco, destaque e notificação. Nessas telas a IA pode usar
+dados de exemplo quando o roteiro não traz números. Depois de montar, o plano passa por uma revisão
+automática (ações impossíveis, blocos inexistentes, duração): se houver problema, a IA corrige uma vez.
 
 No app:
 
@@ -210,7 +218,8 @@ Configurações técnicas (fps, limite de 90 s, duração das transições) fica
 - `src/parse.ts` — lê o .md e monta as cenas, aplica o limite de 90s
 - `src/ai/` — montagem com IA: `director.ts` (pedido ao Claude ou ao Groq, `groq.ts`) e `plan.ts` (esquema do plano e validação)
 - `src/spec.ts` — junta roteiro e plano da IA na especificação do vídeo
-- `src/scenes/` — as 8 cenas do roteiro, `Smart.tsx` (etapas, antes e depois, número, ícones, impacto, depoimento) e `Composition.tsx` (composição livre)
+- `src/scenes/` — as 8 cenas do roteiro, `Smart.tsx` (etapas, antes e depois, número, ícones, impacto, depoimento), `Composition.tsx` (composição livre) e `Interface.tsx` (telas do sistema)
+- `src/ui/` — telas do sistema: `kit.tsx` (componentes no estilo shadcn/ui) e `geometry.ts` (layout, linha do tempo das ações, câmera)
 - `src/motion/` — linguagem de movimento: curvas, tipografia cinética, fundo, transições, sons
 - `src/components/` — logo animado, assistente IAF, ícones
 - `src/Video.tsx` — sequência com transições e barra de progresso

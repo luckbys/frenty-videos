@@ -5,6 +5,11 @@ name: Publicar versão
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag a publicar (ex.: v1.6.0) — cria a tag se ela ainda não existir'
+        required: true
 
 permissions:
   contents: write
@@ -23,10 +28,23 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Definir tag
+        run: echo "TAG=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_ENV"
+
+      - name: Criar tag (quando disparado manualmente)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
       - name: Conferir versão da tag
         run: |
           V=$(node -p "require('./package.json').version")
-          [ "v$V" = "$GITHUB_REF_NAME" ] || { echo "A tag $GITHUB_REF_NAME não bate com a versão $V do package.json"; exit 1; }
+          [ "v$V" = "$TAG" ] || { echo "A tag $TAG não bate com a versão $V do package.json"; exit 1; }
           echo "VERSAO=$V" >> "$GITHUB_ENV"
 
       - name: Instalar dependências
@@ -50,11 +68,12 @@ jobs:
           EXE="$WINBUILD/dist/FrentyVideos-Setup-$VERSAO.exe"
           cp "$EXE" .
           node scripts/manifesto.mjs "FrentyVideos-Setup-$VERSAO.exe" \
-            "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/FrentyVideos-Setup-$VERSAO.exe" latest.json
+            "https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/FrentyVideos-Setup-$VERSAO.exe" latest.json
 
       - name: Publicar em Releases
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.TAG }}
           name: Frenty Vídeos ${{ env.VERSAO }}
           files: |
             FrentyVideos-Setup-${{ env.VERSAO }}.exe

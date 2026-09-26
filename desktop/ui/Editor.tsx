@@ -11,6 +11,7 @@ import { AiPanel, AiSettingsModal } from './AiPanel';
 import { Icon } from './icons';
 import type { ToastFn } from './main';
 import { FORMAT_SHORT, SCENE, sceneTitle, seconds, SNIPPETS, STATUS } from './util';
+import { VoicePanel, VoiceSettingsModal } from './VoicePanel';
 
 const api = window.frenty;
 const T = theme.video.transitionFrames;
@@ -81,6 +82,9 @@ export const Editor: React.FC<{
   const [planRev, setPlanRev] = useState(0);
   const [aiRev, setAiRev] = useState(0);
   const [keyModal, setKeyModal] = useState<null | (() => void)>(null);
+  const [voiceRev, setVoiceRev] = useState(0);
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [voiceOff, setVoiceOff] = useState(false); // "narração: false" neste roteiro
   const [saveState, setSaveState] = useState<'salvo' | 'pendente' | 'salvando'>('salvo');
   const [tab, setTab] = useState<'previa' | 'video'>(meta.videoUrl && meta.status === 'pronto' ? 'video' : 'previa');
   const [frame, setFrame] = useState(45);
@@ -110,6 +114,7 @@ export const Editor: React.FC<{
     const t = setTimeout(async () => {
       const r = await api.parse(md, meta.id);
       setAi(r.ai);
+      setVoiceOff(r.voice === false);
       if (r.ok) {
         setSpec(r.spec);
         setError(null);
@@ -324,6 +329,7 @@ export const Editor: React.FC<{
             },
             { label: 'Mostrar na pasta', icon: 'folder', run: () => void api.showInFolder(meta.id) },
             { label: 'IA da montagem (Claude ou Groq)…', icon: 'sparkle', run: () => setKeyModal(() => () => undefined) },
+            { label: 'Narração por voz (ElevenLabs)…', icon: 'mic', run: () => setVoiceModalOpen(true) },
             { label: 'Excluir vídeo', icon: 'trash', run: onRemove, danger: true },
           ]}
         />
@@ -452,6 +458,12 @@ export const Editor: React.FC<{
                 onSettings={() => setKeyModal(() => () => undefined)}
                 settingsRev={aiRev}
               />
+              <VoicePanel
+                narracaoOff={voiceOff}
+                onToggle={() => md != null && update(setFrontmatter(md, 'narracao', voiceOff ? undefined : 'false'))}
+                onSettings={() => setVoiceModalOpen(true)}
+                settingsRev={voiceRev}
+              />
             </>
           ) : (
             <div className="rendered">
@@ -488,6 +500,14 @@ export const Editor: React.FC<{
             setKeyModal(null);
             if (saved) setAiRev((n) => n + 1);
             if (saved) then();
+          }}
+        />
+      )}
+      {voiceModalOpen && (
+        <VoiceSettingsModal
+          onClose={(saved) => {
+            setVoiceModalOpen(false);
+            if (saved) setVoiceRev((n) => n + 1);
           }}
         />
       )}

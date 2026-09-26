@@ -6,13 +6,18 @@
 // IA: com --ia (ou "montagem: ia" no topo do .md) as cenas são montadas pelo Claude e o plano fica salvo em
 // arquivo.plano-ia.json, reaproveitado enquanto o texto do roteiro não mudar. Precisa de ANTHROPIC_API_KEY.
 // Com --provedor groq (ou FRENTY_IA=groq) quem monta é o Groq; precisa de GROQ_API_KEY.
+// Narração: com ELEVENLABS_API_KEY no ambiente, todo vídeo ganha voz automaticamente (a não ser que o
+// .md tenha "narração: false" no topo, ou --sem-voz). --voz-id troca a voz (padrão: Rachel, multilíngue).
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { composeVideo, planIsStale } from '../src/ai/director';
 import type { StoredPlan } from '../src/ai/plan';
+import { buildNarration } from '../src/audio/narration';
+import { DEFAULT_VOICE_ID, friendlyEleven } from '../src/audio/elevenlabs';
 import { FRENTY, normalizeBrand } from '../src/brand';
 import { readBrandFile } from '../src/brand-file';
 import { scriptOptions } from '../src/parse';
@@ -38,6 +43,8 @@ const redo = flag('--refazer');
 const aiFlag = flag('--ia');
 const provider = (option('--provedor') ?? process.env.FRENTY_IA ?? 'claude').toLowerCase() === 'groq' ? 'groq' : 'claude';
 const model = option('--modelo') ?? process.env.GROQ_MODEL;
+const semVoz = flag('--sem-voz');
+const voiceId = option('--voz-id') ?? process.env.ELEVENLABS_VOICE_ID ?? DEFAULT_VOICE_ID;
 const [input, outArg] = args;
 
 if (!input) {
@@ -98,7 +105,24 @@ async function loadPlan(): Promise<StoredPlan | null> {
 }
 
 (async () => {
-  const { source, ...spec } = { ...buildSpec(markdown, await loadPlan(), aiFlag), brand };
+  const { source, ...built } = { ...buildSpec(markdown, await loadPlan(), aiFlag), brand };
+  let spec = built;
+  const voiceKey = process.env.ELEVENLABS_API_KEY;
+  if (!semVoz && opts.voice && voiceKey) {
+    let last = '';
+    try {
+      const { scenes, tracks } = await buildNarration(spec.scenes, {
+        apiKey: voiceKey,
+        voiceId,
+        cacheDir: path.join(os.tmpdir(), 'frenty-narracao-cache'),
+        onProgress: (p) => p.done !== Number(last) && console.log(`Narração: ${(last = String(p.done))}/${p.total}...`),
+      });
+      spec = { ...spec, scenes, narration: tracks };
+      console.log(`\nNarração gerada para ${tracks.length} cena(s) com a voz do ElevenLabs.`);
+    } catch (e) {
+      throw friendlyEleven(e);
+    }
+  }
   fs.writeFileSync(path.join(root, 'src/ultimo-video.json'), JSON.stringify(spec, null, 2));
 
   const secs = totalFrames(spec.scenes) / theme.video.fps;
@@ -137,6 +161,6 @@ async function loadPlan(): Promise<StoredPlan | null> {
   });
   console.log(`\nVídeo pronto: ${out}`);
 })().catch((e) => {
-  console.error(e instanceof Error && e.name === 'DirectorError' ? e.message : e);
+  console.error(e instanceof Error && (e.name === 'DirectorError' || e.name === 'ElevenLabsError') ? e.message : e);
   process.exit(1);
 });

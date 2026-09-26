@@ -226,9 +226,11 @@ export function scriptOptions(source: string) {
   const m = String(data.montagem ?? '').toLowerCase();
   const fmt = String(data.formato ?? data.format ?? 'horizontal').toLowerCase();
   const sfx = data.efeitos_sonoros ?? data.sons ?? true;
+  const voice = data.narracao ?? data.voz ?? true;
   return {
     format: (fmt in formats ? fmt : 'horizontal') as FormatName,
     sfx: sfx !== false && sfx !== 'nao' && sfx !== 'não',
+    voice: voice !== false && voice !== 'nao' && voice !== 'não',
     marca: data.marca ? String(data.marca).trim() : undefined,
     ai: m === 'ia' || m === 'ai',
     closing: data.encerramento !== false,

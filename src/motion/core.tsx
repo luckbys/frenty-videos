@@ -62,6 +62,16 @@ export const Sfx: React.FC<{ name: SfxName; at: number; volume?: number }> = ({ 
   );
 };
 
+/* ---------- Narração por voz ---------- */
+
+// Uma fala já pronta (áudio gerado pelo ElevenLabs, em data: URI) posicionada no ponto certo da linha do
+// tempo. Independe do interruptor de efeitos sonoros: a pessoa pode desligar o whoosh e manter a voz.
+export const Narration: React.FC<{ src: string; at: number; frames: number; volume?: number }> = ({ src, at, frames, volume = 1 }) => (
+  <Sequence from={Math.max(0, Math.round(at))} durationInFrames={Math.max(1, frames)} layout="none">
+    <Html5Audio src={src} volume={volume} />
+  </Sequence>
+);
+
 /* ---------- Câmera e palco ---------- */
 
 // Empurrão lento de câmera durante a cena, para dar profundidade.

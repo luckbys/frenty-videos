@@ -8,7 +8,7 @@ Cada vídeo tem no máximo **90 segundos**.
 
 Um aplicativo para criar, pré-visualizar e gerenciar os vídeos sem usar o terminal.
 
-- **Windows (recomendado):** rode `FrentyVideos-Setup-1.5.0.exe`. Ele instala o programa com atalho
+- **Windows (recomendado):** rode `FrentyVideos-Setup-1.6.0.exe`. Ele instala o programa com atalho
   na área de trabalho e no menu Iniciar, sem precisar de Node.js nem de internet para gerar vídeos.
   Como o instalador não tem assinatura digital, o Windows pode mostrar "O Windows protegeu o computador":
   clique em **Mais informações** → **Executar assim mesmo**.
@@ -99,6 +99,19 @@ Detalhes técnicos: modelo `claude-opus-5` com raciocínio adaptativo e saída e
 Se o modelo recusar o pedido, a própria API tenta de novo com o modelo reserva recomendado
 (`fallbacks: "default"`).
 
+## Narração por voz
+
+Com uma chave do **ElevenLabs** configurada (**⋯ → Narração por voz** no editor, ou o link "Narração com voz"
+no painel), todo vídeo gerado ganha a fala do roteiro — sem precisar pedir nada. O texto de cada cena (o que
+aparece na tela: título, itens, números, a fala do chat com a IAF…) vira uma narração, e a cena estica o
+tempo que for preciso para a fala nunca ser cortada (o vídeo pode passar dos 90s de limite nesse caso). Dá
+para trocar a voz na mesma janela, e desligar a narração só num vídeo com **Desligar neste vídeo** (ou
+`narração: false` no topo do roteiro).
+
+A chave fica guardada só no computador, criptografada, e o uso é cobrado na conta dona da chave — crie uma em
+elevenlabs.io/app/developers. O áudio de cada cena fica em cache (não gasta créditos de novo enquanto o texto
+e a voz não mudarem).
+
 ## Linha de comando
 
 ### Instalar (uma vez)
@@ -128,6 +141,13 @@ npm run render -- exemplos/briefing-livre-ia.md --ia --pedido "mais curto, desta
 npm run render -- exemplos/briefing-livre-ia.md --ia --refazer   # monta do zero
 # com o Groq (precisa de GROQ_API_KEY); --modelo troca o modelo padrão qwen/qwen3.8-27b
 npm run render -- exemplos/briefing-livre-ia.md --ia --refazer --provedor groq
+```
+
+Com narração por voz (basta ter `ELEVENLABS_API_KEY` no ambiente — liga sozinho; use `--sem-voz` para
+desligar só nesta geração, ou `--voz-id` para trocar a voz padrão):
+
+```bash
+npm run render -- exemplos/lancamento-iaf.md
 ```
 
 Pré-visualizar e ajustar no navegador (Remotion Studio):
@@ -217,6 +237,7 @@ Configurações técnicas (fps, limite de 90 s, duração das transições) fica
 - `src/brand-file.ts` — leitura de perfis `.json` e logos do disco
 - `src/parse.ts` — lê o .md e monta as cenas, aplica o limite de 90s
 - `src/ai/` — montagem com IA: `director.ts` (pedido ao Claude ou ao Groq, `groq.ts`) e `plan.ts` (esquema do plano e validação)
+- `src/audio/` — narração por voz: `elevenlabs.ts` (pedido à API) e `narration.ts` (texto de cada cena, cache, estica a cena para caber a fala)
 - `src/spec.ts` — junta roteiro e plano da IA na especificação do vídeo
 - `src/scenes/` — as 8 cenas do roteiro, `Smart.tsx` (etapas, antes e depois, número, ícones, impacto, depoimento), `Composition.tsx` (composição livre) e `Interface.tsx` (telas do sistema)
 - `src/ui/` — telas do sistema: `kit.tsx` (componentes no estilo shadcn/ui) e `geometry.ts` (layout, linha do tempo das ações, câmera)

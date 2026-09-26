@@ -94,4 +94,7 @@ export type VideoSpec = {
   brand?: Partial<Brand>; // perfil já carregado; sem ele, vale o padrão Frenty
   icons?: CustomIcon[]; // ícones criados pela IA para este vídeo
   rhythm?: Rhythm; // ritmo das transições escolhido pela IA
+  // Narração por voz (ElevenLabs): um áudio por cena, gerado antes da renderização.
+  // "index" aponta para a cena em `scenes`; "frames" é a duração exata da fala (a cena em si já vem esticada para caber).
+  narration?: { index: number; src: string; frames: number }[];
 };

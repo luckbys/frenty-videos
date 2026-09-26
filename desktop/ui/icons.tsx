@@ -2,6 +2,7 @@ import React from 'react';
 
 const paths: Record<string, React.ReactNode> = {
   plus: <path d="M12 5v14M5 12h14" />,
+  mic: <path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3zM6 11a6 6 0 0012 0M12 19v2" />,
   upload: <path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" />,
   play: <path d="M7 5l12 7-12 7V5z" />,
   folder: <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />,

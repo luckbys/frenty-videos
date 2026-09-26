@@ -3,10 +3,12 @@ import { fork, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { composeVideo, GROQ_DEFAULT_MODEL, planIsStale, recomposeScene } from '../src/ai/director';
+import { DEFAULT_VOICE_ID, friendlyEleven, listVoices as fetchVoices } from '../src/audio/elevenlabs';
+import { buildNarration } from '../src/audio/narration';
 import type { Brand } from '../src/brand';
 import { LOGO_EXTENSIONS, logoToDataUrl } from '../src/brand-file';
 import { scriptOptions } from '../src/parse';
-import type { AiEvent, AiKeyStatus, AiProvider, AiSettings, AiSettingsPatch, NewVideo, RenderEvent } from './api';
+import type { AiEvent, AiKeyStatus, AiProvider, AiSettings, AiSettingsPatch, NewVideo, RenderEvent, VoiceSettings, VoiceSettingsPatch } from './api';
 import { Library, parse } from './library';
 import { setFrontmatter } from './markdown';
 import { Updater } from './updater';
@@ -65,6 +67,9 @@ type Settings = {
   aiKeyPlain?: boolean;
   groqKey?: string;
   groqKeyPlain?: boolean;
+  voiceId?: string; // ElevenLabs: voz escolhida
+  voiceKey?: string;
+  voiceKeyPlain?: boolean;
 };
 const readSettings = (): Settings => {
   try {
@@ -115,6 +120,38 @@ const aiSettings = (): AiSettings => ({
   groqModel: readSettings().groqModel || GROQ_DEFAULT_MODEL,
   defaultGroqModel: GROQ_DEFAULT_MODEL,
   keys: { claude: keyStatus('claude'), groq: keyStatus('groq') },
+});
+
+// Chave do ElevenLabs (narração por voz): mesmo esquema das chaves de IA acima, guardada à parte
+// porque não é uma "IA da montagem" — funciona junto com qualquer uma delas, ou com a montagem automática.
+const voiceStoredKey = () => {
+  const s = readSettings();
+  const v = s.voiceKey;
+  if (!v) return undefined;
+  try {
+    return s.voiceKeyPlain ? v : safeStorage.decryptString(Buffer.from(v, 'base64'));
+  } catch {
+    return undefined;
+  }
+};
+const saveVoiceKey = (key: string | null) => {
+  const k = key?.trim();
+  if (!k) writeSettings({ voiceKey: undefined, voiceKeyPlain: undefined });
+  else if (safeStorage.isEncryptionAvailable()) writeSettings({ voiceKey: safeStorage.encryptString(k).toString('base64'), voiceKeyPlain: undefined });
+  else writeSettings({ voiceKey: k, voiceKeyPlain: true });
+};
+const voiceApiKey = () => voiceStoredKey() || process.env.ELEVENLABS_API_KEY || undefined;
+const voiceKeyStatus = (): AiKeyStatus => {
+  const k = voiceStoredKey();
+  if (k) return { configured: true, source: 'app', hint: `…${k.slice(-4)}` };
+  const env = process.env.ELEVENLABS_API_KEY;
+  if (env) return { configured: true, source: 'ambiente', hint: `…${env.slice(-4)}` };
+  return { configured: false, source: null };
+};
+const voiceSettings = (): VoiceSettings => ({
+  voiceId: readSettings().voiceId || DEFAULT_VOICE_ID,
+  defaultVoiceId: DEFAULT_VOICE_ID,
+  key: voiceKeyStatus(),
 });
 
 let win: BrowserWindow | null = null;
@@ -242,6 +279,21 @@ function registerIpc() {
     if (p.groqKey !== undefined) saveKey('groq', p.groqKey);
     return aiSettings();
   });
+  h('voiceSettings', voiceSettings);
+  h('setVoiceSettings', (p: VoiceSettingsPatch) => {
+    if (p.voiceId !== undefined) writeSettings({ voiceId: p.voiceId.trim() && p.voiceId.trim() !== DEFAULT_VOICE_ID ? p.voiceId.trim() : undefined });
+    if (p.apiKey !== undefined) saveVoiceKey(p.apiKey);
+    return voiceSettings();
+  });
+  h('listVoices', async () => {
+    const key = voiceApiKey();
+    if (!key) return { ok: false as const, error: 'Configure a chave do ElevenLabs primeiro.' };
+    try {
+      return { ok: true as const, voices: await fetchVoices(key) };
+    } catch (e) {
+      return { ok: false as const, error: friendlyEleven(e).message };
+    }
+  });
   h('openExternal', (url: string) => (/^https:\/\//.test(url) ? shell.openExternal(url) : undefined));
 
   h('importMarkdown', async () => {
@@ -269,17 +321,34 @@ function registerIpc() {
     return true;
   });
 
-  h('render', (id: string) => {
+  h('render', async (id: string) => {
     if (rendering.has(id)) return;
     const p = library.prepare(id);
     if (!p.ok) {
       emit({ id, kind: 'error', message: p.error });
       return;
     }
+    let spec = p.spec;
+    const key = voiceApiKey();
+    if (key && scriptOptions(library.markdown(id)).voice) {
+      emit({ id, kind: 'progress', stage: 'Gerando a narração', progress: 0 });
+      try {
+        const { scenes, tracks } = await buildNarration(spec.scenes, {
+          apiKey: key,
+          voiceId: readSettings().voiceId || DEFAULT_VOICE_ID,
+          cacheDir: path.join(app.getPath('userData'), 'narracao-cache'),
+          onProgress: (pr) => emit({ id, kind: 'progress', stage: `Gerando a narração (${pr.done}/${pr.total})`, progress: 0 }),
+        });
+        spec = { ...spec, scenes, narration: tracks };
+      } catch (e) {
+        emit({ id, kind: 'error', message: friendlyEleven(e).message });
+        return;
+      }
+    }
     if (!worker) startWorker();
     rendering.set(id, p.stamp);
     const out = library.outputFor(id);
-    worker!.send({ type: 'render', id, spec: p.spec, ...out });
+    worker!.send({ type: 'render', id, spec, ...out });
     emit({ id, kind: 'progress', stage: 'Na fila', progress: 0 });
   });
   h('cancelRender', (id: string) => worker?.send({ type: 'cancel', id }));

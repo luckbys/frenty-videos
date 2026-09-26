@@ -3,6 +3,11 @@
 Cada versão publicada mostra, na janela "Nova versão disponível", os itens da sua seção abaixo.
 Escreva uma seção `## <versão>` com uma linha `- ` por novidade antes de publicar.
 
+## 1.6.0
+
+- Narração por voz pelo ElevenLabs: configure a chave e todo vídeo ganha a fala do roteiro sozinho.
+- A cena estica o tempo certo para a narração nunca ser cortada; dá para trocar a voz ou desligar só num vídeo.
+
 ## 1.5.0
 
 - A IA agora monta telas do sistema (painéis, formulários, tabelas, chat da IAF) no estilo shadcn, com cursor, digitação, zoom e notificações animadas.

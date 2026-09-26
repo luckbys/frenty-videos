@@ -1,6 +1,6 @@
 {
   "name": "frenty-video",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "atualizacoes": "https://github.com/luckbys/frenty-videos/releases/latest/download/latest.json",
   "description": "Gerador de vídeos em motion graphics com a identidade visual Frenty a partir de arquivos .md",

@@ -39,6 +39,18 @@ export const Guide: React.FC = () => (
         quando você pede.
       </p>
     </article>
+    <article className="guide-card plain guide-ai">
+      <h3>Narração por voz</h3>
+      <p>
+        Configure a chave do <strong>ElevenLabs</strong> em <strong>⋯ → Narração por voz</strong> e todo vídeo gerado ganha a fala do roteiro
+        sozinho — não precisa pedir nada. O texto de cada cena (título, itens, números, a fala do chat com a IAF…) vira narração, e a cena
+        estica o tempo que for preciso para a fala nunca ser cortada.
+      </p>
+      <p className="muted small">
+        Dá para trocar a voz na mesma janela, ou desligar só num vídeo em <strong>Desligar neste vídeo</strong> (ou{' '}
+        <code>narração: false</code> no topo do roteiro).
+      </p>
+    </article>
     <div className="guide-grid">
       {blocks.map((b) => (
         <article key={b.type} className="guide-card" style={{ ['--c' as string]: SCENE[b.type].color }}>

@@ -4,7 +4,7 @@ import { AbsoluteFill, continueRender, delayRender, interpolate, useCurrentFrame
 import { linearTiming, TransitionSeries } from '@remotion/transitions';
 import { BrandProvider, useBrand } from './brand';
 import { CustomIconsProvider } from './components/Icons';
-import { Sfx, SfxProvider } from './motion/core';
+import { Narration, Sfx, SfxProvider } from './motion/core';
 import { brandBars, push, ringReveal } from './motion/transitions';
 import { SceneView } from './scenes';
 import { theme } from './theme';
@@ -58,7 +58,7 @@ const useBrandFonts = () => {
   }, [handle, names]);
 };
 
-const Frames: React.FC<{ scenes: Scene[]; rhythm: Rhythm }> = ({ scenes, rhythm }) => {
+const Frames: React.FC<{ scenes: Scene[]; rhythm: Rhythm; narration?: VideoSpec['narration'] }> = ({ scenes, rhythm, narration }) => {
   useBrandFonts();
   const { C, fonts } = useBrand();
   const t = theme.video.transitionFrames;
@@ -89,15 +89,18 @@ const Frames: React.FC<{ scenes: Scene[]; rhythm: Rhythm }> = ({ scenes, rhythm 
       {starts.slice(1).map((s, i) => (
         <Sfx key={i} name="whoosh" at={s - 4} volume={0.28} />
       ))}
+      {narration?.map((n) => (
+        <Narration key={`n${n.index}`} src={n.src} at={starts[n.index]} frames={n.frames} />
+      ))}
     </AbsoluteFill>
   );
 };
 
-export const FrentyVideo: React.FC<VideoSpec> = ({ scenes, sfx = true, brand, icons, rhythm = 'equilibrado' }) => (
+export const FrentyVideo: React.FC<VideoSpec> = ({ scenes, sfx = true, brand, icons, rhythm = 'equilibrado', narration }) => (
   <BrandProvider brand={brand}>
     <SfxProvider value={sfx}>
       <CustomIconsProvider icons={icons}>
-        <Frames scenes={scenes} rhythm={rhythm} />
+        <Frames scenes={scenes} rhythm={rhythm} narration={narration} />
       </CustomIconsProvider>
     </SfxProvider>
   </BrandProvider>

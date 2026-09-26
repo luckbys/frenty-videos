@@ -58,11 +58,13 @@ const aiInfo = (markdown: string, plan: StoredPlan | null, origin?: number[]): A
 };
 
 export function parse(markdown: string, plan: StoredPlan | null = null): ParseResult {
+  // scriptOptions (gray-matter) só roda aqui, no processo principal: a tela (renderer) não tem Buffer do Node.
+  const voice = scriptOptions(markdown).voice;
   try {
     const { source, origin, ...spec } = buildSpec(markdown, plan);
-    return { ok: true, spec, seconds: totalFrames(spec.scenes) / theme.video.fps, ai: aiInfo(markdown, plan, source === 'ia' ? origin : undefined) };
+    return { ok: true, spec, seconds: totalFrames(spec.scenes) / theme.video.fps, ai: aiInfo(markdown, plan, source === 'ia' ? origin : undefined), voice };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : String(e), ai: aiInfo(markdown, plan) };
+    return { ok: false, error: e instanceof Error ? e.message : String(e), ai: aiInfo(markdown, plan), voice };
   }
 }
 

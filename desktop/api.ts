@@ -33,7 +33,7 @@ export type AiInfo = {
   origin?: number[]; // cena do plano de cada cena do vídeo
 };
 
-export type ParseResult = ({ ok: true; spec: VideoSpec; seconds: number } | { ok: false; error: string }) & { ai?: AiInfo };
+export type ParseResult = ({ ok: true; spec: VideoSpec; seconds: number } | { ok: false; error: string }) & { ai?: AiInfo; voice?: boolean };
 
 export type AiEvent = { id: string; kind: 'progress'; stage: string } | { id: string; kind: 'done' } | { id: string; kind: 'error'; message: string };
 
@@ -56,6 +56,11 @@ export type AiProvider = 'claude' | 'groq';
 // Qual IA monta os vídeos e as chaves de cada uma (a chave nunca volta para a tela, só o final dela).
 export type AiSettings = { provider: AiProvider; groqModel: string; defaultGroqModel: string; keys: Record<AiProvider, AiKeyStatus> };
 export type AiSettingsPatch = { provider?: AiProvider; groqModel?: string; claudeKey?: string | null; groqKey?: string | null };
+
+// Narração por voz (ElevenLabs): com a chave configurada, todo vídeo gerado ganha narração sozinho.
+export type VoiceOption = { id: string; name: string };
+export type VoiceSettings = { voiceId: string; defaultVoiceId: string; key: AiKeyStatus };
+export type VoiceSettingsPatch = { voiceId?: string; apiKey?: string | null };
 
 export type RenderEvent =
   | { id: string; kind: 'progress'; stage: string; progress: number }
@@ -81,6 +86,9 @@ export type FrentyApi = {
   onAi(cb: (e: AiEvent) => void): () => void;
   aiSettings(): Promise<AiSettings>;
   setAiSettings(patch: AiSettingsPatch): Promise<AiSettings>;
+  voiceSettings(): Promise<VoiceSettings>;
+  setVoiceSettings(patch: VoiceSettingsPatch): Promise<VoiceSettings>;
+  listVoices(): Promise<{ ok: true; voices: VoiceOption[] } | { ok: false; error: string }>;
   openExternal(url: string): Promise<void>;
   updateInfo(): Promise<UpdateInfo>;
   checkUpdate(): Promise<UpdateInfo>;

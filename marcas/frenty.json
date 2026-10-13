@@ -9,16 +9,16 @@
     "simbolo": true
   },
   "cores": {
-    "primaria": "#6C5CE7",
-    "destaque": "#00D26A",
-    "secundaria": "#00A8FF",
-    "fundo": "#F8F9FA",
-    "texto": "#2D3436",
-    "fundoEscuro": "#241C5C"
+    "primaria": "#6F40B2",
+    "destaque": "#01C1EB",
+    "secundaria": "#4F7FD6",
+    "fundo": "#F5F4FA",
+    "texto": "#1D1440",
+    "fundoEscuro": "#2A1259"
   },
   "fontes": {
-    "titulos": "Plus Jakarta Sans",
-    "texto": "Plus Jakarta Sans",
+    "titulos": "Nunito",
+    "texto": "Nunito",
     "logo": "Nunito"
   },
   "estilo": {

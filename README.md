@@ -182,18 +182,19 @@ O tipo de cada cena é detectado pelo conteúdo:
 | Parágrafo | Frase de impacto: palavras sobem de trás de uma máscara, destaques ganham marca-texto |
 | Lista `- item` | Cartões com ícone escolhido pela palavra em negrito (estoque, vendas, WhatsApp…) |
 | Lista `- **+35%** texto` (todos com número em negrito) | Cartões com contagem animada e medidor circular (até 4) |
-| Lista `- Jan: 120` (todos "rótulo: número") | Gráfico de barras que crescem, linha de tendência e maior valor em verde |
+| Lista `- Jan: 120` (todos "rótulo: número") | Gráfico de barras que crescem, linha de tendência e maior valor na cor de destaque |
 | Citação `> **Você:** …` / `> **IAF:** …` | Chat com a IAF: a pessoa pergunta, a IAF aparece digitando e responde |
-| Parágrafo com link `[Botão](site.com)` | Botão verde; um cursor entra, clica e o endereço é digitado |
+| Parágrafo com link `[Botão](site.com)` | Botão na cor de destaque; um cursor entra, clica e o endereço é digitado |
 
 - `**negrito**` vira destaque na cor da marca.
 - Forçar tipo: `<!-- tipo: grafico -->` (texto, lista, numeros, grafico, conversa, chamada).
 - Forçar duração da cena: `<!-- duracao: 6 -->` (segundos).
 
 Linguagem de movimento (fixa, em `src/motion/`):
-- Abertura e encerramento com o logo se montando (anel se desenha, pontos caem, letras sobem) e onda circular
+- Abertura e encerramento com o logo se montando e onda circular (na Frenty, a logo oficial: o disco cresce,
+  os pontos do F estalam e as letras sobem; nas outras marcas, o anel se desenha e os pontos caem)
 - Fundo com aurora de cor, anéis do símbolo, grade de pontos e partículas; câmera com leve aproximação
-- Três transições da marca: anel do logo abrindo do centro, faixas roxa/azul/verde atravessando e empurrão lateral
+- Três transições da marca: anel do logo abrindo do centro, faixas nas cores da marca atravessando e empurrão lateral
 - Efeitos sonoros sutis (whoosh, pop, clique, digitação, assinatura do logo), sintetizados por `scripts/gen-sfx.mjs`.
   Para desligar num vídeo: `efeitos_sonoros: false` no topo do .md
 
@@ -206,8 +207,10 @@ e diz quantas cenas remover.
 No app, abra **Identidade visual** na barra lateral. Cada marca tem:
 
 - **Empresa:** nome, slogan (cena final), site e nome do assistente da cena de conversa
-- **Logo:** envie SVG ou PNG para fundo claro e para fundo escuro (até 2 MB). Sem arquivo,
-  o logo é desenhado: o texto do logotipo e, se quiser, o símbolo de anel com três pontos
+- **Logo:** envie SVG ou PNG para fundo claro e para fundo escuro (até 2 MB). Sem arquivo, a Frenty
+  usa a logo oficial vetorizada (`marcas/frenty-logo/`, gerada por `scripts/vetorizar-logo.py` a partir
+  do PNG oficial) e as outras marcas ganham o logo desenhado: o texto do logotipo e, se quiser, o símbolo
+  de anel com três pontos
 - **Cores:** primária, destaque, secundária, fundo claro, texto e fundo escuro (automático
   ou fixo). O app avisa quando alguma combinação fica difícil de ler, e o vídeo escurece
   sozinho uma cor clara demais quando ela vira texto
@@ -222,7 +225,8 @@ como *Desatualizado* até serem gerados de novo.
 Uma marca é a **padrão** (menu da marca → Usar como padrão). No editor, o seletor ao lado das
 abas da prévia escolhe outra marca só para aquele vídeo (grava `marca: id` no topo do roteiro).
 Perfis podem ser exportados e importados como `.json` para usar em outro computador.
-A marca Frenty não pode ser excluída, mas pode ser restaurada ao padrão do manual.
+A marca Frenty não pode ser excluída, mas pode ser restaurada ao padrão oficial (roxo `#6F40B2`,
+ciano `#01C1EB` da logo, fundo escuro `#2A1259`, tipografia Nunito).
 
 **Na linha de comando** a marca vem de, nesta ordem: `--marca arquivo.json`; `marca:` no topo
 do `.md` (um id procura `marcas/<id>.json`, ou um caminho `.json`); `marca.json` na raiz do
@@ -230,6 +234,17 @@ projeto; e, sem nada disso, a Frenty. Em um `.json` escrito à mão, o logo pode
 relativo ao próprio arquivo (`"arquivoClaro": "logo.svg"`). Veja `marcas/frenty.json` como modelo.
 
 Configurações técnicas (fps, limite de 90 s, duração das transições) ficam em `src/theme.ts`.
+
+## Comerciais sob medida
+
+Peças feitas à mão (fora do gerador por .md), com a identidade oficial e cenas próprias:
+
+- **Módulo de Ordens de Serviço** (9:16, 60 s), em `src/comerciais/modulo-os/`:
+  `npx remotion render src/index.ts ComercialModuloOS saida/frenty-modulo-os.mp4`.
+  O roteiro (duração de cada cena, transições e texto da narração) fica em `roteiro.ts`. A trilha é
+  sintetizada por `node scripts/gerar-trilha.mjs`; a narração entra pela prop `vozes` (um áudio por
+  cena, na ordem do roteiro), e a trilha abaixa sozinha quando há voz. Para conferir quadros soltos:
+  `npx tsx scripts/quadros.ts ComercialModuloOS pasta 120 480 900`.
 
 ## Estrutura
 
@@ -242,7 +257,8 @@ Configurações técnicas (fps, limite de 90 s, duração das transições) fica
 - `src/scenes/` — as 8 cenas do roteiro, `Smart.tsx` (etapas, antes e depois, número, ícones, impacto, depoimento), `Composition.tsx` (composição livre) e `Interface.tsx` (telas do sistema)
 - `src/ui/` — telas do sistema: `kit.tsx` (componentes no estilo shadcn/ui) e `geometry.ts` (layout, linha do tempo das ações, câmera)
 - `src/motion/` — linguagem de movimento: curvas, tipografia cinética, fundo, transições, sons
-- `src/components/` — logo animado, assistente IAF, ícones
+- `src/components/` — logo animado (`FrentyLogo.tsx` é a logo oficial vetorizada), assistente IAF, ícones
+- `src/comerciais/` — comerciais sob medida (cenas, transições e roteiro próprios)
 - `src/Video.tsx` — sequência com transições e barra de progresso
 - `scripts/render.ts` — CLI de render
 - `desktop/` — app desktop (Electron): `main.ts` (janela e biblioteca), `brands.ts` (marcas), `render-worker.ts` (geração em segundo plano), `ui/` (interface React; `BrandStudio.tsx` é a tela de identidade visual, `AiPanel.tsx` o painel da montagem com IA)

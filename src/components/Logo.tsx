@@ -1,11 +1,12 @@
 import React from 'react';
 import { Img, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { EASE, SPRING, tween } from '../motion/core';
-import { useBrand } from '../brand';
+import { usaLogoFrenty, useBrand } from '../brand';
+import { FrentyLogo } from './FrentyLogo';
 
 // Logo da marca. Com arquivo enviado no perfil, usa o arquivo (com revelação animada);
-// sem arquivo, desenha o símbolo (anel com três pontos) e a palavra do logotipo:
-// o anel se desenha, os pontos caem um a um e as letras sobem.
+// sem arquivo, a marca Frenty usa a logo oficial vetorizada e as outras marcas ganham o símbolo
+// desenhado (anel com três pontos) e a palavra do logotipo: o anel se desenha, os pontos caem e as letras sobem.
 export const Logo: React.FC<{ size: number; variant?: 'dark' | 'light'; delay?: number; animate?: boolean; glow?: boolean }> = ({
   size,
   variant = 'light',
@@ -43,6 +44,10 @@ export const Logo: React.FC<{ size: number; variant?: 'dark' | 'light'; delay?: 
         }}
       />
     );
+  }
+
+  if (usaLogoFrenty(brand)) {
+    return <FrentyLogo height={size} variant={dark ? 'escuro' : 'claro'} corEscura={C.primaryDeep} delay={delay} animate={animate} brilho={glow} />;
   }
 
   const ring = tween(f, 0, 22, EASE.out);

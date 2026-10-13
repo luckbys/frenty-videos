@@ -11,7 +11,7 @@ export type Brand = {
   assistente: string;
   logo: {
     texto: string; // palavra do logotipo desenhado
-    simbolo: boolean; // anel com três pontos
+    simbolo: boolean; // disco com o F de pontos (logo oficial quando o texto é "frenty")
     arquivoClaro?: string; // data URL (SVG/PNG) para fundos claros
     arquivoEscuro?: string; // data URL para fundos escuros; sem ele, o claro é usado em branco
   };
@@ -32,7 +32,7 @@ export type Brand = {
   };
 };
 
-// Padrão: Manual de Identidade Visual Frenty ERP (cores marcadas como "aprox." no manual).
+// Padrão: identidade oficial Frenty (ciano da logo oficial, roxo dos posts da marca, tipografia Nunito).
 export const FRENTY: Brand = {
   id: 'frenty',
   nome: 'Frenty',
@@ -40,10 +40,13 @@ export const FRENTY: Brand = {
   site: 'frenty.com.br',
   assistente: 'IAF',
   logo: { texto: 'frenty', simbolo: true },
-  cores: { primaria: '#6C5CE7', destaque: '#00D26A', secundaria: '#00A8FF', fundo: '#F8F9FA', texto: '#2D3436', fundoEscuro: '#241C5C' },
-  fontes: { titulos: 'Plus Jakarta Sans', texto: 'Plus Jakarta Sans', logo: 'Nunito' },
+  cores: { primaria: '#6F40B2', destaque: '#01C1EB', secundaria: '#4F7FD6', fundo: '#F5F4FA', texto: '#1D1440', fundoEscuro: '#2A1259' },
+  fontes: { titulos: 'Nunito', texto: 'Nunito', logo: 'Nunito' },
   estilo: { arredondamento: 'suave', marcaDagua: true, barraProgresso: true, particulas: true },
 };
+
+// Perfis com o logotipo "frenty" e símbolo ligado usam o símbolo oficial (disco com o F de pontos).
+export const usaLogoFrenty = (b: Brand) => b.logo.simbolo && b.logo.texto.trim().toLowerCase() === 'frenty';
 
 const FONT_NAMES = new Set<string>(FONTS.map((f) => f.name));
 const text = (v: unknown, fallback: string) => (typeof v === 'string' ? v.trim() : fallback);

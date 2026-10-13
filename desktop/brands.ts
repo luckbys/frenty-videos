@@ -15,6 +15,22 @@ export class BrandStore {
     this.dir = path.join(libraryRoot, 'Marcas');
     fs.mkdirSync(this.dir, { recursive: true });
     if (!fs.existsSync(this.file(FRENTY.id))) this.write(FRENTY);
+    else this.upgradeFrenty();
+  }
+
+  // Perfil Frenty ainda com as cores e fontes antigas (do manual "aprox.") e nunca editado: passa para a identidade oficial.
+  private upgradeFrenty() {
+    try {
+      const b = this.load(this.file(FRENTY.id));
+      const c = b.cores;
+      const antigo =
+        [c.primaria, c.destaque, c.secundaria, c.fundo, c.texto].join().toUpperCase() === '#6C5CE7,#00D26A,#00A8FF,#F8F9FA,#2D3436' &&
+        b.fontes.titulos === 'Plus Jakarta Sans' &&
+        b.fontes.texto === 'Plus Jakarta Sans';
+      if (antigo) this.write({ ...b, cores: { ...FRENTY.cores }, fontes: { ...FRENTY.fontes } });
+    } catch {
+      // perfil ilegível: fica como está (a lista já ignora arquivos com erro)
+    }
   }
 
   private file(id: string) {

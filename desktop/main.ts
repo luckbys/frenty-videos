@@ -409,7 +409,7 @@ function registerIpc() {
       defaultId: 1,
       cancelId: 1,
       message: 'Restaurar a identidade Frenty original?',
-      detail: 'Cores, fontes, logo e textos da marca Frenty voltam ao padrão do manual.',
+      detail: 'Cores, fontes, logo e textos da marca Frenty voltam ao padrão oficial.',
     });
     return r.response === 0 ? library.brands.resetFrenty() : null;
   });

@@ -1,8 +1,9 @@
 // Fundo animado com os elementos da marca: aurora de cor, anéis do logo, pontos e partículas.
 import React, { useMemo } from 'react';
 import { AbsoluteFill, interpolate, random, useCurrentFrame } from 'remotion';
-import { useBrand } from '../brand';
+import { usaLogoFrenty, useBrand } from '../brand';
 import { alpha } from '../color';
+import { BARRA, DISCO, HASTE, PONTO_MEIO, PONTO_R } from '../components/frenty-logo-data';
 import { useLayout } from './core';
 
 const Aurora: React.FC<{ dark: boolean }> = ({ dark }) => {
@@ -35,25 +36,34 @@ const Aurora: React.FC<{ dark: boolean }> = ({ dark }) => {
   );
 };
 
-// Anéis concêntricos inspirados no símbolo do logo.
+// Anéis concêntricos inspirados no símbolo do logo. Na Frenty, o miolo é o F de pontos da logo oficial
+// (parado, enquanto os anéis giram); nas outras marcas, os três pontos do símbolo desenhado.
 const Rings: React.FC<{ dark: boolean }> = ({ dark }) => {
   const frame = useCurrentFrame();
   const { u, width, height, vertical } = useLayout();
-  const { C } = useBrand();
+  const { brand, C } = useBrand();
   const stroke = dark ? 'rgba(255,255,255,0.09)' : alpha(C.primary, 0.08);
   const size = 1100 * u;
   const cx = vertical ? width * 0.85 : width * 0.9;
   const cy = vertical ? height * 0.12 : height * 0.82;
+  const k = (size * 0.1) / (HASTE[2].cy - HASTE[1].cy); // unidades da logo → px (espaço entre os pontos da haste)
   return (
     <svg width={width} height={height} style={{ position: 'absolute', inset: 0 }}>
       <g transform={`translate(${cx} ${cy}) rotate(${frame * 0.15})`}>
         <circle r={size * 0.5} fill="none" stroke={stroke} strokeWidth={2 * u} />
         <circle r={size * 0.36} fill="none" stroke={stroke} strokeWidth={28 * u} />
         <circle r={size * 0.62} fill="none" stroke={stroke} strokeWidth={2 * u} strokeDasharray={`${6 * u} ${22 * u}`} />
-        {[0, 1, 2].map((i) => (
-          <circle key={i} cx={-size * 0.12} cy={(i - 1) * size * 0.1} r={14 * u} fill={stroke} />
-        ))}
+        {!usaLogoFrenty(brand) &&
+          [0, 1, 2].map((i) => <circle key={i} cx={-size * 0.12} cy={(i - 1) * size * 0.1} r={14 * u} fill={stroke} />)}
       </g>
+      {usaLogoFrenty(brand) && (
+        <g transform={`translate(${cx} ${cy}) scale(${k}) translate(${-DISCO.cx} ${-DISCO.cy})`} fill={stroke}>
+          {[...HASTE, PONTO_MEIO].map((p, i) => (
+            <circle key={i} cx={p.cx} cy={p.cy} r={PONTO_R} />
+          ))}
+          <rect x={BARRA.x} y={BARRA.y} width={BARRA.w} height={BARRA.h} rx={BARRA.h / 2} />
+        </g>
+      )}
     </svg>
   );
 };

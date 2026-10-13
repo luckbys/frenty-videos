@@ -1,0 +1,508 @@
+{
+  "versao": 1,
+  "geradoEm": "2026-10-13T00:00:00Z",
+  "modelo": "manual",
+  "formato": "vertical",
+  "fonte": "0df2af46dafed357",
+  "plano": {
+    "resumo": "Módulo de Ordens de Serviço: dor da gestão manual, o módulo, telas de criação, acompanhamento e histórico no celular, benefícios, integração e chamada para demonstração.",
+    "ritmo": "energico",
+    "icones": [],
+    "cenas": [
+      {
+        "tipo": "abertura",
+        "segundos": 5.5,
+        "titulo": "Diga adeus à **gestão manual** de O.S.",
+        "subtitulo": "Papel, planilha e WhatsApp não dão conta.",
+        "narracao": "Ordem de serviço no papel, na planilha, no grupo do WhatsApp? Diga adeus à gestão manual."
+      },
+      {
+        "tipo": "comparacao",
+        "segundos": 7.5,
+        "fundo": "claro",
+        "titulo": "Do improviso ao **controle total**",
+        "antes": {
+          "rotulo": "Hoje",
+          "itens": [
+            "O.S. no papel e na planilha",
+            "Etapas esquecidas",
+            "Custo sem controle",
+            "Cliente sem resposta"
+          ]
+        },
+        "depois": {
+          "rotulo": "Com o Módulo O.S.",
+          "itens": [
+            "Tudo num lugar só",
+            "Cada etapa registrada",
+            "Custo de cada O.S.",
+            "Cliente bem informado"
+          ]
+        },
+        "narracao": "Etapa esquecida, custo que ninguém confere, cliente sem resposta. Isso acaba aqui."
+      },
+      {
+        "tipo": "impacto",
+        "segundos": 5.5,
+        "fundo": "cor",
+        "cor": "primaria",
+        "chamada": "Módulo O.S. integrado ao ERP",
+        "texto": "Criação, acompanhamento e fechamento **num lugar só**.",
+        "narracao": "Conheça o Módulo de Ordens de Serviço, integrado ao seu é-erre-pê. Criação, acompanhamento e fechamento, num lugar só."
+      },
+      {
+        "tipo": "interface",
+        "segundos": 7.5,
+        "fundo": "escuro",
+        "cor": "primaria",
+        "titulo": "Abra a O.S. **em segundos**",
+        "moldura": "celular",
+        "endereco": "",
+        "tela": "Nova O.S.",
+        "menu": [],
+        "blocos": [
+          {
+            "id": "cliente",
+            "tipo": "cartao",
+            "largura": 12,
+            "altura": 1,
+            "titulo": "Oficina Ribeiro Ltda.",
+            "texto": "Cliente desde 2021 · 14 O.S. no histórico",
+            "icone": "users",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "nova",
+            "tipo": "formulario",
+            "largura": 12,
+            "altura": 3,
+            "titulo": "Nova ordem de serviço",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Serviço",
+                "valor": "Manutenção preventiva",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Técnico",
+                "valor": "Carlos Mendes",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Prazo",
+                "valor": "18/10 às 17h",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Etapas",
+                "valor": "Diagnóstico, execução, teste",
+                "detalhe": "",
+                "status": "neutro"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": "Abrir O.S."
+          },
+          {
+            "id": "aberta",
+            "tipo": "notificacao",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "O.S. 1.248 aberta",
+            "texto": "Equipe e cliente já foram avisados.",
+            "icone": "check",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          }
+        ],
+        "acoes": [
+          {
+            "alvo": "nova",
+            "acao": "digitar",
+            "texto": "Manutenção preventiva"
+          },
+          {
+            "alvo": "nova",
+            "acao": "clicar",
+            "texto": ""
+          },
+          {
+            "alvo": "aberta",
+            "acao": "notificar",
+            "texto": ""
+          }
+        ],
+        "narracao": "Abra uma ó-ésse em segundos e registre cada etapa do serviço."
+      },
+      {
+        "tipo": "interface",
+        "segundos": 7.5,
+        "fundo": "claro",
+        "cor": "secundaria",
+        "titulo": "Prazo e custo **em tempo real**",
+        "moldura": "celular",
+        "endereco": "",
+        "tela": "O.S. 1.248",
+        "menu": [],
+        "blocos": [
+          {
+            "id": "prazo",
+            "tipo": "indicador",
+            "largura": 6,
+            "altura": 1,
+            "titulo": "Prazo restante",
+            "texto": "",
+            "icone": "clock",
+            "valor": "48 h",
+            "variacao": "no prazo",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "custo",
+            "tipo": "indicador",
+            "largura": 6,
+            "altura": 1,
+            "titulo": "Custo",
+            "texto": "",
+            "icone": "coin",
+            "valor": "R$ 1.840",
+            "variacao": "dentro do orçado",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "etapas",
+            "tipo": "progresso",
+            "largura": 12,
+            "altura": 2,
+            "titulo": "Andamento",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Diagnóstico",
+                "valor": "100%",
+                "detalhe": "",
+                "status": "ok"
+              },
+              {
+                "rotulo": "Execução",
+                "valor": "65%",
+                "detalhe": "",
+                "status": "atencao"
+              },
+              {
+                "rotulo": "Teste e entrega",
+                "valor": "0%",
+                "detalhe": "",
+                "status": "neutro"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "pecas",
+            "tipo": "tabela",
+            "largura": 12,
+            "altura": 2,
+            "titulo": "Custos lançados",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Peças",
+                "valor": "R$ 980",
+                "detalhe": "Execução",
+                "status": "ok"
+              },
+              {
+                "rotulo": "Mão de obra",
+                "valor": "R$ 720",
+                "detalhe": "Execução",
+                "status": "ok"
+              },
+              {
+                "rotulo": "Deslocamento",
+                "valor": "R$ 140",
+                "detalhe": "Diagnóstico",
+                "status": "ok"
+              }
+            ],
+            "serie": [],
+            "colunas": [
+              "Item",
+              "Valor",
+              "Etapa"
+            ],
+            "botao": ""
+          }
+        ],
+        "acoes": [
+          {
+            "alvo": "prazo",
+            "acao": "destacar",
+            "texto": ""
+          },
+          {
+            "alvo": "etapas",
+            "acao": "zoom",
+            "texto": ""
+          },
+          {
+            "alvo": "custo",
+            "acao": "destacar",
+            "texto": ""
+          }
+        ],
+        "narracao": "Acompanhe em tempo real o prazo de execução e o custo de cada ordem."
+      },
+      {
+        "tipo": "interface",
+        "segundos": 7.5,
+        "fundo": "escuro",
+        "cor": "destaque",
+        "titulo": "Histórico de cada cliente, **equipe em sintonia**",
+        "moldura": "celular",
+        "endereco": "",
+        "tela": "Histórico do cliente",
+        "menu": [],
+        "blocos": [
+          {
+            "id": "busca",
+            "tipo": "busca",
+            "largura": 12,
+            "altura": 1,
+            "titulo": "Buscar cliente",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Oficina Ribeiro Ltda.",
+                "valor": "14 O.S.",
+                "detalhe": "",
+                "status": "neutro"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "hist",
+            "tipo": "lista",
+            "largura": 12,
+            "altura": 3,
+            "titulo": "Oficina Ribeiro · histórico",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "O.S. 1.248 · Preventiva",
+                "valor": "Em andamento",
+                "detalhe": "Hoje",
+                "status": "atencao"
+              },
+              {
+                "rotulo": "O.S. 1.192 · Troca de peças",
+                "valor": "Fechada",
+                "detalhe": "12/09",
+                "status": "ok"
+              },
+              {
+                "rotulo": "O.S. 1.107 · Instalação",
+                "valor": "Fechada",
+                "detalhe": "03/08",
+                "status": "ok"
+              },
+              {
+                "rotulo": "O.S. 1.050 · Revisão",
+                "valor": "Fechada",
+                "detalhe": "20/06",
+                "status": "ok"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "equipe",
+            "tipo": "notificacao",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "Carlos atualizou a O.S. 1.248",
+            "texto": "Execução em 65%. Todos já estão vendo.",
+            "icone": "users",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          }
+        ],
+        "acoes": [
+          {
+            "alvo": "busca",
+            "acao": "digitar",
+            "texto": "Oficina Ribeiro"
+          },
+          {
+            "alvo": "hist",
+            "acao": "destacar",
+            "texto": ""
+          },
+          {
+            "alvo": "equipe",
+            "acao": "notificar",
+            "texto": ""
+          }
+        ],
+        "narracao": "Histórico completo de cada cliente, e a equipe inteira vendo a mesma informação, na hora."
+      },
+      {
+        "tipo": "grade_icones",
+        "segundos": 8,
+        "fundo": "escuro",
+        "cor": "destaque",
+        "titulo": "Benefícios que **impulsionam** o seu negócio",
+        "itens": [
+          {
+            "icone": "layers",
+            "rotulo": "Organização",
+            "texto": "Tudo centralizado, sem retrabalho"
+          },
+          {
+            "icone": "bolt",
+            "rotulo": "Eficiência",
+            "texto": "Menos erros e esquecimentos"
+          },
+          {
+            "icone": "smile",
+            "rotulo": "Satisfação",
+            "texto": "Cliente informado e confiante"
+          },
+          {
+            "icone": "wallet",
+            "rotulo": "Custos",
+            "texto": "Cada serviço monitorado"
+          },
+          {
+            "icone": "chart",
+            "rotulo": "Relatórios",
+            "texto": "Decisões com dados"
+          },
+          {
+            "icone": "refresh",
+            "rotulo": "Integração",
+            "texto": "CRM e ERP conectados"
+          }
+        ],
+        "narracao": "Mais organização, menos erros, clientes mais satisfeitos, custos sob controle e relatórios para decidir melhor."
+      },
+      {
+        "tipo": "etapas",
+        "segundos": 6.5,
+        "fundo": "claro",
+        "cor": "primaria",
+        "titulo": "Integre e **automatize**",
+        "itens": [
+          {
+            "titulo": "Integre com o CRM",
+            "texto": "Ciclo completo do cliente",
+            "icone": "users"
+          },
+          {
+            "titulo": "Automatize tarefas",
+            "texto": "Menos trabalho manual",
+            "icone": "gear"
+          },
+          {
+            "titulo": "Responda mais rápido",
+            "texto": "Melhor experiência",
+            "icone": "rocket"
+          }
+        ],
+        "narracao": "Integre com o seu cê-erre-eme e automatize tarefas para responder mais rápido."
+      },
+      {
+        "tipo": "chamada",
+        "segundos": 5.5,
+        "titulo": "Solicite uma **demonstração gratuita**",
+        "texto": "Comece hoje a otimizar suas Ordens de Serviço.",
+        "botao": "Quero uma demonstração",
+        "url": "frenty.com.br",
+        "narracao": "Comece hoje mesmo. Solicite uma demonstração gratuita."
+      },
+      {
+        "tipo": "encerramento",
+        "segundos": 4.4,
+        "slogan": "Mais tempo para o seu negócio crescer.",
+        "url": "frenty.com.br",
+        "narracao": "Frenty. Mais tempo para o seu negócio crescer."
+      }
+    ]
+  }
+}

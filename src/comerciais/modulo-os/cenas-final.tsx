@@ -6,7 +6,8 @@ import { FrentyLogo } from '../../components/FrentyLogo';
 import { LineIcon } from '../../components/Icons';
 import { EASE, SPRING, Sfx, tween } from '../../motion/core';
 import { K, M } from './tokens';
-import { Bg, Burst, Card, CheckBadge, Fade, Kicker, Pill, Push, Tap, Title, Typed, useSpring } from './ui';
+import { Brilho, IL, Palco, Sombra, useMola } from './ilustracoes';
+import { Bg, Burst, CheckBadge, Fade, Kicker, Push, Tap, Title, Typed, useSpring } from './ui';
 
 /* ---------- Cena 7: benefícios ---------- */
 
@@ -17,14 +18,68 @@ const BENEFITS = [
   { icon: 'wallet', t: 'Controle de custos', s: 'Cada serviço monitorado' },
   { icon: 'chart', t: 'Relatórios', s: 'Decisões com dados na mão' },
 ];
-const MONTHS = [
-  { m: 'Mai', v: 42 },
-  { m: 'Jun', v: 55 },
-  { m: 'Jul', v: 51 },
-  { m: 'Ago', v: 68 },
-  { m: 'Set', v: 74 },
-  { m: 'Out', v: 88 },
+// Ilustração de crescimento: colunas que sobem e uma seta ciana subindo por cima delas.
+type P = [number, number];
+const COLUNAS = [110, 160, 136, 220, 300];
+const COL_W = 104;
+const COL_GAP = 40;
+const COL_X0 = 540 - (COLUNAS.length * COL_W + (COLUNAS.length - 1) * COL_GAP) / 2;
+const CHAO = 1690;
+const SETA: P[] = [
+  [130, 1580],
+  [252, 1510],
+  [396, 1462],
+  [540, 1484],
+  [684, 1398],
+  [850, 1300],
 ];
+const SETA_AT = 146;
+
+const Crescimento: React.FC<{ at: number }> = ({ at }) => {
+  const frame = useCurrentFrame();
+  const mola = useMola();
+  const seta = tween(frame, SETA_AT, 24, EASE.inOut);
+  const ponta = mola(SETA_AT + 20, { damping: 10, stiffness: 170, mass: 0.6 });
+  const [a, b] = [SETA[SETA.length - 2], SETA[SETA.length - 1]];
+  const ang = (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI;
+  const d = SETA.map(([x, y], i) => `${i ? 'L' : 'M'}${x} ${y}`).join(' ');
+  const base = tween(frame, at - 4, 14, EASE.out);
+  return (
+    <Palco>
+      <Sombra x={540} y={CHAO + 8} rx={420 * base} ry={30} />
+      <rect x={540 - 380 * base} y={CHAO - 2} width={760 * base} height={10} rx={5} fill="rgba(255,255,255,0.28)" />
+      {COLUNAS.map((h, i) => {
+        const g = mola(at + i * 6, { damping: 13, stiffness: 120, mass: 0.8 });
+        if (g <= 0.001) return null;
+        const x = COL_X0 + i * (COL_W + COL_GAP);
+        const hh = h * g;
+        const ultima = i === COLUNAS.length - 1;
+        return (
+          <g key={i}>
+            <rect x={x} y={CHAO - hh} width={COL_W} height={hh} rx={18} fill={ultima ? 'url(#il-ciano)' : 'url(#il-papel)'} filter="url(#il-drop-sm)" />
+            <rect x={x + COL_W * 0.66} y={CHAO - hh} width={COL_W * 0.34} height={hh} rx={0} fill={ultima ? IL.cianoEscuro : IL.roxo} opacity={ultima ? 0.35 : 0.14} />
+            <rect x={x + 16} y={CHAO - hh + 16} width={COL_W * 0.3} height={Math.max(0, Math.min(10, hh - 30))} rx={5} fill="rgba(255,255,255,0.7)" />
+          </g>
+        );
+      })}
+      {seta > 0 && (
+        <g>
+          <path d={d} fill="none" stroke={IL.roxoProfundo} strokeWidth={38} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray="1 1" strokeDashoffset={1 - seta} opacity={0.55} />
+          <path d={d} fill="none" stroke={IL.ciano} strokeWidth={24} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray="1 1" strokeDashoffset={1 - seta} />
+        </g>
+      )}
+      {ponta > 0.001 && (
+        <g transform={`translate(${b[0]} ${b[1]}) rotate(${ang}) scale(${ponta})`}>
+          <path d="M44 0 L-26 -40 L-12 0 L-26 40 Z" fill={IL.roxoProfundo} opacity={0.55} transform="scale(1.18)" />
+          <path d="M44 0 L-26 -40 L-12 0 L-26 40 Z" fill={IL.ciano} strokeLinejoin="round" />
+        </g>
+      )}
+      <Brilho x={930} y={1236} r={24} at={SETA_AT + 22} />
+      <Brilho x={772} y={1288} r={14} at={SETA_AT + 28} />
+      <Brilho x={968} y={1352} r={16} at={SETA_AT + 34} />
+    </Palco>
+  );
+};
 
 export const CenaBeneficios: React.FC = () => {
   const frame = useCurrentFrame();
@@ -62,36 +117,7 @@ export const CenaBeneficios: React.FC = () => {
             </div>
           );
         })}
-        <Card at={118} from="bottom" dist={300} float={4} style={{ left: M, right: M, top: 1270, padding: '28px 34px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: 32, fontWeight: 900 }}>Relatório de O.S.</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: K.inkSoft }}>O.S. concluídas por mês</div>
-            </div>
-            <Pill text="Personalizado" color="#0A8FB3" tint={alpha(K.cyan, 0.14)} size={21} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 22, height: 190, marginTop: 18 }}>
-            {MONTHS.map((m, i) => {
-              const h = tween(frame, 130 + i * 6, 26, EASE.out);
-              const last = i === MONTHS.length - 1;
-              return (
-                <div key={m.m} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, height: '100%', justifyContent: 'flex-end' }}>
-                  <div style={{ fontSize: 20, fontWeight: 900, color: last ? '#0A8FB3' : K.inkSoft, opacity: h }}>{Math.round(m.v * h)}</div>
-                  <div
-                    style={{
-                      width: '100%',
-                      height: `${(m.v / 100) * 70 * h}%`,
-                      borderRadius: 14,
-                      background: last ? `linear-gradient(180deg, ${K.cyanText}, ${K.cyan})` : `linear-gradient(180deg, ${alpha(K.purple, 0.85)}, ${alpha(K.purple, 0.45)})`,
-                      boxShadow: last ? `0 10px 24px ${alpha(K.cyan, 0.45)}` : undefined,
-                    }}
-                  />
-                  <div style={{ fontSize: 19, fontWeight: 800, color: K.inkSoft }}>{m.m}</div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+        <Crescimento at={118} />
       </Push>
       <div style={{ position: 'absolute', left: M, top: 150 }}>
         <Title text={'Benefícios que\n**impulsionam**\nseu negócio'} at={2} size={100} />
@@ -100,10 +126,11 @@ export const CenaBeneficios: React.FC = () => {
       {BENEFITS.map((_, i) => (
         <Sfx key={i} name="pop" at={34 + i * 14 + 2} volume={0.26} />
       ))}
-      <Sfx name="whoosh" at={118} volume={0.22} />
-      {MONTHS.map((_, i) => (
-        <Sfx key={i} name="tick" at={132 + i * 6} volume={0.16} />
+      {COLUNAS.map((_, i) => (
+        <Sfx key={i} name="tick" at={120 + i * 6} volume={0.18} />
       ))}
+      <Sfx name="whoosh" at={SETA_AT} volume={0.26} />
+      <Sfx name="chime" at={SETA_AT + 22} volume={0.26} />
     </Bg>
   );
 };

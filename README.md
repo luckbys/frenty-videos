@@ -241,6 +241,8 @@ Peças feitas à mão (fora do gerador por .md), com a identidade oficial e cena
 
 - **Módulo de Ordens de Serviço** (9:16, 60 s), em `src/comerciais/modulo-os/`:
   `npx remotion render src/index.ts ComercialModuloOS saida/frenty-modulo-os.mp4`.
+  As cenas são ilustradas, sem telas de sistema inventadas: as peças (pessoas, van, cronômetro,
+  medidor, moedas, selo etc.) ficam em `ilustracoes.tsx` e servem para outros comerciais.
   O roteiro (duração de cada cena, transições e texto da narração) fica em `roteiro.ts`. A trilha é
   sintetizada por `node scripts/gerar-trilha.mjs`; a narração entra pela prop `vozes` (um áudio por
   cena, na ordem do roteiro), e a trilha abaixa sozinha quando há voz. Para conferir quadros soltos:

@@ -6,7 +6,8 @@ import { FrentyLogo } from '../../components/FrentyLogo';
 import { LineIcon } from '../../components/Icons';
 import { EASE, SPRING, Sfx, tween } from '../../motion/core';
 import { K, M, SHADOW } from './tokens';
-import { AppHeader, Bg, Card, Fade, IconTile, Kicker, Phone, Pill, Push, Title, useSpring } from './ui';
+import { Cronometro, Glifo, IL, Lapis, MiniPalco, MoedaAsas, Palco, Pessoa, PilhaMoedas, Pop, Selo, Sombra, Txt, useMola } from './ilustracoes';
+import { Bg, Fade, Kicker, Push, Title, useSpring } from './ui';
 
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
@@ -312,15 +313,98 @@ export const CenaCaos: React.FC = () => {
 
 /* ---------- Cena 2: os problemas ---------- */
 
+// Cada problema ganha uma ilustração (desenhada em torno de 0,0 num quadro de 220 px).
+const EtapasEsquecidas: React.FC = () => {
+  const frame = useCurrentFrame();
+  const bob = Math.sin(frame / 7) * 4;
+  return (
+    <g>
+      <Sombra y={106} rx={78} />
+      <g transform="rotate(-7)">
+        <rect x={-70} y={-90} width={140} height={182} rx={18} fill="url(#il-papel)" filter="url(#il-drop-sm)" />
+        <rect x={-30} y={-102} width={60} height={24} rx={9} fill="url(#il-metal)" />
+        {[0, 1, 2].map((i) => {
+          const y = -36 + i * 44;
+          const ok = i !== 1;
+          return (
+            <g key={i}>
+              {ok ? (
+                <>
+                  <circle cx={-40} cy={y} r={14} fill={IL.verde} />
+                  <Glifo nome="check" x={-40} y={y} s={18} cor={IL.branco} sw={3.6} />
+                </>
+              ) : (
+                <circle cx={-40} cy={y} r={13} fill="none" stroke={IL.vermelho} strokeWidth={3.4} strokeDasharray="5 5" />
+              )}
+              <rect x={-16} y={y - 6} width={ok ? 64 : 50} height={12} rx={6} fill={ok ? IL.lavandaEscura : IL.lavanda} />
+            </g>
+          );
+        })}
+      </g>
+      <g transform={`translate(68 ${-78 + bob})`}>
+        <circle r={32} fill={IL.vermelho} filter="url(#il-drop-sm)" />
+        <Txt y={15} s={44} anchor="middle">
+          ?
+        </Txt>
+      </g>
+    </g>
+  );
+};
+
+const CustosVoando: React.FC = () => {
+  const frame = useCurrentFrame();
+  const bate = 0.5 + 0.5 * Math.abs(Math.sin(frame / 3.2));
+  return (
+    <g>
+      <g transform="translate(-38 84)">
+        <PilhaMoedas n={4} rx={50} />
+      </g>
+      {[0, 1].map((k) => {
+        const t = ((frame + k * 26) % 52) / 52;
+        const x = -26 + t * 112;
+        const y = 4 - t * 92 + Math.sin(t * Math.PI * 2) * 6;
+        return (
+          <g key={k} transform={`translate(${x} ${y}) rotate(${-12 + t * 20})`} opacity={Math.min(1, t * 6, (1 - t) * 3)}>
+            <MoedaAsas r={26 + t * 6} bate={bate} />
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
+const ClienteSemResposta: React.FC = () => {
+  const frame = useCurrentFrame();
+  const bob = Math.sin(frame / 8) * 3;
+  return (
+    <g>
+      <g transform="translate(-36 30)">
+        <Pessoa r={70} pele="#C98B63" cabelo="#3A2418" roupa={IL.azul} fundo="#FFE3CC" estilo="curto" humor="triste" id="cliente-problema" />
+      </g>
+      <g transform={`translate(54 ${-64 + bob})`}>
+        <path d="M-54 -32 Q-54 -46 -40 -46 L40 -46 Q54 -46 54 -32 L54 20 Q54 34 40 34 L-12 34 L-34 54 L-30 34 L-40 34 Q-54 34 -54 20 Z" fill={IL.branco} filter="url(#il-drop-sm)" />
+        <Txt y={10} s={56} cor={IL.vermelho} anchor="middle">
+          ?
+        </Txt>
+        <g transform="translate(50 -42)">
+          <circle r={22} fill={IL.ambar} />
+          <Glifo nome="relogio" s={26} cor={IL.branco} sw={2.8} />
+        </g>
+      </g>
+    </g>
+  );
+};
+
 const PROBLEMS = [
-  { icon: 'alert', title: 'Etapas esquecidas', sub: 'Ninguém sabe em que pé está', color: K.red, tint: K.redTint },
-  { icon: 'coin', title: 'Custos sem controle', sub: 'Peças e horas fora da conta', color: K.amber, tint: K.amberTint },
-  { icon: 'chat', title: 'Cliente sem resposta', sub: 'E a confiança vai embora', color: K.red, tint: K.redTint },
+  { title: 'Etapas esquecidas', sub: 'Ninguém sabe em que pé está', Il: EtapasEsquecidas },
+  { title: 'Custos sem controle', sub: 'Peças e horas fora da conta', Il: CustosVoando },
+  { title: 'Cliente sem resposta', sub: 'E a confiança vai embora', Il: ClienteSemResposta },
 ];
 const STRIKE = 78;
 
 export const CenaProblemas: React.FC = () => {
   const frame = useCurrentFrame();
+  const mola = useMola();
   return (
     <Bg focus={[50, 45]}>
       <div style={{ position: 'absolute', left: M, top: 460 }}>
@@ -328,21 +412,26 @@ export const CenaProblemas: React.FC = () => {
       </div>
       {PROBLEMS.map((pb, i) => {
         const at = 8 + i * 15;
+        const pop = mola(at, { damping: 11, stiffness: 150, mass: 0.7 });
+        const txt = tween(frame, at + 4, 16, EASE.out);
         const strike = tween(frame, STRIKE + i * 5, 12, EASE.out);
-        // Os cartões caem logo depois de riscados, antes do título entrar no lugar deles.
+        // Os problemas caem logo depois de riscados, antes do título entrar no lugar deles.
         const fall = tween(frame, STRIKE + 12 + i * 3, 16, EASE.in);
         const shake = frame > at + 6 && frame < at + 16 ? Math.sin(frame * 2.7) * (at + 16 - frame) * 1.1 : 0;
         return (
           <div key={pb.title} style={{ position: 'absolute', left: M, top: 620 + i * 250, width: 1080 - M * 2, height: 214, transform: `translate(${shake}px, ${fall * 900}px) rotate(${fall * (i % 2 ? 10 : -12)}deg)`, opacity: 1 - fall }}>
-            <Card at={at} from="right" dist={900} rot={6} radius={36} pad={0} style={{ left: 0, top: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', gap: 30, padding: '0 36px' }}>
-              <IconTile icon={pb.icon} size={124} bg={pb.tint} color={pb.color} stroke={2.4} />
-              <div>
-                <div style={{ fontSize: 54, fontWeight: 900, letterSpacing: -1.2 }}>{pb.title}</div>
-                <div style={{ fontSize: 31, fontWeight: 700, color: K.inkSoft, marginTop: 2 }}>{pb.sub}</div>
-              </div>
-            </Card>
+            <div style={{ position: 'absolute', left: 0, top: -3, width: 220, height: 220, transform: `scale(${pop}) rotate(${(1 - Math.min(1, pop)) * -24}deg)` }}>
+              <MiniPalco size={220}>
+                <circle r={106} fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" strokeWidth={3} />
+                <pb.Il />
+              </MiniPalco>
+            </div>
+            <div style={{ position: 'absolute', left: 262, right: -20, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', color: K.white, opacity: txt, transform: `translateX(${(1 - txt) * 90}px)` }}>
+              <div style={{ fontSize: 54, fontWeight: 900, letterSpacing: -1.2, lineHeight: 1.05 }}>{pb.title}</div>
+              <div style={{ fontSize: 31, fontWeight: 700, color: alpha(K.white, 0.75), marginTop: 6 }}>{pb.sub}</div>
+            </div>
             {/* Risco ciano por cima do problema */}
-            <div style={{ position: 'absolute', left: -20, top: 99, height: 16, width: (1080 - M * 2 + 40) * strike, borderRadius: 8, background: K.cyan, boxShadow: `0 0 30px ${alpha(K.cyan, 0.8)}` }} />
+            <div style={{ position: 'absolute', left: -20, top: 80, height: 16, width: (1080 - M * 2 + 40) * strike, borderRadius: 8, background: K.cyan, boxShadow: `0 0 30px ${alpha(K.cyan, 0.8)}` }} />
           </div>
         );
       })}
@@ -362,35 +451,72 @@ export const CenaProblemas: React.FC = () => {
 
 /* ---------- Cena 3: a marca e o módulo ---------- */
 
-// Celular que surge pela borda de baixo com a lista de O.S. (antecipa as telas das próximas cenas).
-const PEEK = [
-  { n: '#1248', c: 'Oficina Ribeiro', st: 'Em execução', col: '#B87700', tint: K.amberTint },
-  { n: '#1247', c: 'Auto Center Sul', st: 'Aberta', col: K.navy, tint: K.navyTint },
-  { n: '#1246', c: 'Mecânica Souza', st: 'Fechada', col: K.green, tint: K.greenTint },
-];
-const PeekPhone: React.FC<{ at: number }> = ({ at }) => {
-  const sp = useSpring();
-  const p = sp(at, SPRING.heavy);
+// Os três momentos da O.S. (criação, acompanhamento e fechamento) ligados por uma trilha pontilhada.
+const PASSOS = ['Criação', 'Acompanhamento', 'Fechamento'];
+const PASSOS_X = [220, 540, 860];
+const PASSOS_Y = 1540;
+
+const DocNovo: React.FC = () => (
+  <g>
+    <Sombra y={84} rx={62} />
+    <g transform="rotate(-6)">
+      <rect x={-50} y={-64} width={100} height={128} rx={14} fill="url(#il-papel)" filter="url(#il-drop-sm)" />
+      <rect x={-34} y={-44} width={50} height={10} rx={5} fill={IL.roxo} />
+      {[0, 1, 2].map((i) => (
+        <rect key={i} x={-34} y={-18 + i * 22} width={i === 2 ? 38 : 66} height={9} rx={4.5} fill={IL.lavandaEscura} />
+      ))}
+    </g>
+    <g transform="translate(22 46)">
+      <Lapis s={64} />
+    </g>
+    <g transform="translate(46 -60)">
+      <circle r={24} fill={IL.ciano} filter="url(#il-drop-sm)" />
+      <path d="M0 -11 V11 M-11 0 H11" stroke={IL.branco} strokeWidth={5.5} strokeLinecap="round" />
+    </g>
+  </g>
+);
+
+const PASSOS_AT = 118;
+
+const Passos: React.FC<{ at: number }> = ({ at }) => {
+  const frame = useCurrentFrame();
+  const viagem = tween(frame, at + 22, 30, EASE.inOut);
+  const xPonto = PASSOS_X[0] + (PASSOS_X[2] - PASSOS_X[0]) * viagem;
+  // quadro em que o ponto chega a cada passo (a curva é simétrica: metade do caminho na metade do tempo)
+  const chegadas = [at + 22, at + 37, at + 52];
   return (
-    <div style={{ position: 'absolute', left: 240, top: interpolate(p, [0, 1], [1980, 1470]), width: 600, perspective: 2000 }}>
-      <div style={{ transform: `rotateX(${16 - 8 * p}deg)`, transformOrigin: '50% 0%' }}>
-        <Phone width={600}>
-          <AppHeader title="Ordens de serviço" sub="Hoje" right={<LineIcon name="search" size={24} color="#fff" />} />
-          <div style={{ position: 'absolute', left: 16, right: 16, top: 166, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {PEEK.map((o) => (
-              <div key={o.n} style={{ background: '#fff', borderRadius: 18, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 6px 18px rgba(29,20,64,0.06)' }}>
-                <IconTile icon="doc" size={44} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 16, fontWeight: 900 }}>O.S. {o.n}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: K.inkSoft }}>{o.c}</div>
-                </div>
-                <Pill text={o.st} color={o.col} tint={o.tint} size={12} />
-              </div>
-            ))}
-          </div>
-        </Phone>
-      </div>
-    </div>
+    <Palco>
+      {new Array(31).fill(0).map((_, k) => {
+        const x = PASSOS_X[0] + (k * (PASSOS_X[2] - PASSOS_X[0])) / 30;
+        if (PASSOS_X.some((px) => Math.abs(px - x) < 104)) return null;
+        return <circle key={k} cx={x} cy={PASSOS_Y} r={5.5} fill={IL.branco} opacity={0.45 * tween(frame, at + 8 + k * 0.5, 6)} />;
+      })}
+      {viagem > 0 && viagem < 1 && (
+        <g>
+          <circle cx={xPonto} cy={PASSOS_Y} r={22} fill={IL.ciano} opacity={0.5} filter="url(#il-glow)" />
+          <circle cx={xPonto} cy={PASSOS_Y} r={11} fill={IL.ciano} />
+        </g>
+      )}
+      {PASSOS.map((nome, i) => {
+        const onda = (frame - chegadas[i]) / 16;
+        return (
+          <g key={nome}>
+            {onda > 0 && onda < 1 && <circle cx={PASSOS_X[i]} cy={PASSOS_Y} r={106 + onda * 40} fill="none" stroke={IL.ciano} strokeWidth={5} opacity={0.7 * (1 - onda)} />}
+            <Pop at={at + i * 7} x={PASSOS_X[i]} y={PASSOS_Y} rot={i === 1 ? 0 : i === 0 ? -14 : 14}>
+              <circle r={104} fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)" strokeWidth={3} />
+              {i === 0 && <DocNovo />}
+              {i === 1 && <Cronometro r={60} p={tween(frame, at + 12, 44, EASE.inOut) * 0.8} ang={(frame - at) * 7} />}
+              {i === 2 && <Selo r={54} draw={tween(frame, at + 24, 12)} />}
+            </Pop>
+            <g opacity={tween(frame, at + 6 + i * 7, 12)}>
+              <Txt x={PASSOS_X[i]} y={PASSOS_Y + 156} s={36} anchor="middle">
+                {nome}
+              </Txt>
+            </g>
+          </g>
+        );
+      })}
+    </Palco>
   );
 };
 
@@ -433,12 +559,12 @@ export const CenaMarca: React.FC = () => {
       <div style={{ position: 'absolute', left: 0, right: 0, top: 790 }}>
         <Title text={'Ordens de\n**Serviço**'} at={74} size={168} align="center" lh={0.96} />
       </div>
-      <Fade at={104} style={{ position: 'absolute', left: M, right: M, top: 1130, textAlign: 'center', fontSize: 44, fontWeight: 800, lineHeight: 1.3, color: alpha(K.white, 0.9) }}>
+      <Fade at={100} style={{ position: 'absolute', left: M, right: M, top: 1130, textAlign: 'center', fontSize: 44, fontWeight: 800, lineHeight: 1.3, color: alpha(K.white, 0.9) }}>
         Criação, acompanhamento e fechamento
         <br />
         em um só lugar.
       </Fade>
-      <Fade at={122} style={{ position: 'absolute', left: 0, right: 0, top: 1290, display: 'flex', justifyContent: 'center' }}>
+      <Fade at={110} style={{ position: 'absolute', left: 0, right: 0, top: 1270, display: 'flex', justifyContent: 'center' }}>
         <div
           style={{
             display: 'flex',
@@ -457,14 +583,18 @@ export const CenaMarca: React.FC = () => {
           Integrado ao seu ERP
         </div>
       </Fade>
-      <PeekPhone at={128} />
+      <Passos at={PASSOS_AT} />
       <Sfx name="pop" at={8} volume={0.3} />
       <Sfx name="pop" at={12} volume={0.25} />
       <Sfx name="pop" at={16} volume={0.25} />
       <Sfx name="chime" at={24} volume={0.3} />
       <Sfx name="whoosh" at={60} volume={0.25} />
-      <Sfx name="pop" at={124} volume={0.3} />
-      <Sfx name="whoosh" at={126} volume={0.22} />
+      <Sfx name="pop" at={112} volume={0.3} />
+      {PASSOS.map((_, i) => (
+        <Sfx key={i} name="pop" at={PASSOS_AT + 2 + i * 7} volume={0.2} />
+      ))}
+      <Sfx name="tick" at={PASSOS_AT + 37} volume={0.3} />
+      <Sfx name="tick" at={PASSOS_AT + 52} volume={0.35} />
     </Bg>
   );
 };

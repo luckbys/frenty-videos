@@ -1,0 +1,567 @@
+{
+  "versao": 1,
+  "geradoEm": "2026-10-13T00:00:00Z",
+  "modelo": "manual",
+  "formato": "horizontal",
+  "fonte": "b70fd0b7ab6e6867",
+  "plano": {
+    "resumo": "Comercial do Frenty Transportes Plus: dor da transportadora que cresceu, o pacote, telas do financeiro, do F-Mobile e da Mensageria, preço e chamada para contratar.",
+    "ritmo": "equilibrado",
+    "icones": [],
+    "cenas": [
+      {
+        "tipo": "abertura",
+        "segundos": 5.5,
+        "titulo": "Sua transportadora cresceu. **E o controle?**",
+        "subtitulo": "Mais gente, mais viagens, a mesma gestão espalhada.",
+        "narracao": "Sua transportadora cresceu. Mais gente, mais viagens. E o controle, onde está?"
+      },
+      {
+        "tipo": "comparacao",
+        "segundos": 8,
+        "fundo": "claro",
+        "titulo": "A operação cresceu, o controle ficou espalhado",
+        "antes": {
+          "rotulo": "Hoje",
+          "itens": [
+            "Planilha, caderno e WhatsApp pessoal",
+            "Ninguém sabe quem está devendo",
+            "O histórico some quando alguém sai",
+            "Equipe na rua sem lançar nada"
+          ]
+        },
+        "depois": {
+          "rotulo": "Com o Transportes Plus",
+          "itens": [
+            "Operação inteira dentro do ERP",
+            "Financeiro e cobrança na mesma base",
+            "Histórico de cada cliente num lugar só",
+            "Equipe lança pelo celular"
+          ]
+        },
+        "narracao": "Planilha, caderno, WhatsApp pessoal. Ninguém sabe quem está devendo, e o histórico some quando alguém sai."
+      },
+      {
+        "tipo": "impacto",
+        "segundos": 5.5,
+        "fundo": "cor",
+        "cor": "primaria",
+        "chamada": "Frenty Transportes Plus",
+        "texto": "Operação, financeiro, CRM e WhatsApp **na mesma conta**.",
+        "narracao": "Conheça o Frenty Transportes Plus: operação, financeiro, cê-erre-eme e WhatsApp na mesma conta."
+      },
+      {
+        "tipo": "grade_icones",
+        "segundos": 8.5,
+        "fundo": "escuro",
+        "cor": "destaque",
+        "titulo": "Tudo o que vem no pacote",
+        "itens": [
+          {
+            "icone": "truck",
+            "rotulo": "F-Transportes Plus",
+            "texto": "Operação e parte fiscal no ERP"
+          },
+          {
+            "icone": "wallet",
+            "rotulo": "F-Finanças + F-Cobrança",
+            "texto": "Pagar, receber e cobrar"
+          },
+          {
+            "icone": "users",
+            "rotulo": "F-CRM",
+            "texto": "Histórico de cada cliente"
+          },
+          {
+            "icone": "phone",
+            "rotulo": "F-Mobile",
+            "texto": "Equipe em campo no celular"
+          },
+          {
+            "icone": "spark",
+            "rotulo": "Assistente de IA",
+            "texto": "Apoio no dia a dia da gestão"
+          },
+          {
+            "icone": "chat",
+            "rotulo": "Mensageria",
+            "texto": "WhatsApp com número da empresa"
+          }
+        ],
+        "narracao": "Operação e parte fiscal, finanças, cobrança e clientes na mesma base. E uma inteligência artificial apoiando sua equipe."
+      },
+      {
+        "tipo": "interface",
+        "segundos": 8,
+        "fundo": "claro",
+        "cor": "primaria",
+        "titulo": "Quem deve e **quanto entra no mês**",
+        "moldura": "navegador",
+        "endereco": "frenty.app/financeiro",
+        "tela": "Financeiro",
+        "menu": [
+          {
+            "rotulo": "Painel",
+            "icone": "home"
+          },
+          {
+            "rotulo": "Transportes",
+            "icone": "truck"
+          },
+          {
+            "rotulo": "Financeiro",
+            "icone": "wallet"
+          },
+          {
+            "rotulo": "Cobrança",
+            "icone": "receipt"
+          },
+          {
+            "rotulo": "CRM",
+            "icone": "users"
+          },
+          {
+            "rotulo": "Mensageria",
+            "icone": "chat"
+          }
+        ],
+        "blocos": [
+          {
+            "id": "receber",
+            "tipo": "indicador",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "A receber no mês",
+            "texto": "",
+            "icone": "coin",
+            "valor": "R$ 84.320",
+            "variacao": "+12%",
+            "tendencia": "sobe",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "pagar",
+            "tipo": "indicador",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "A pagar no mês",
+            "texto": "",
+            "icone": "wallet",
+            "valor": "R$ 51.870",
+            "variacao": "-4%",
+            "tendencia": "desce",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "atraso",
+            "tipo": "indicador",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "Em atraso",
+            "texto": "",
+            "icone": "alert",
+            "valor": "R$ 6.140",
+            "variacao": "3 clientes",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "atencao",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "cobrancas",
+            "tipo": "tabela",
+            "largura": 12,
+            "altura": 2,
+            "titulo": "Cobranças",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Distribuidora Andrade",
+                "valor": "R$ 12.400",
+                "detalhe": "05/11",
+                "status": "ok"
+              },
+              {
+                "rotulo": "Agro Serra",
+                "valor": "R$ 3.980",
+                "detalhe": "28/10",
+                "status": "atencao"
+              },
+              {
+                "rotulo": "Mercado Bom Preço",
+                "valor": "R$ 2.160",
+                "detalhe": "25/10",
+                "status": "erro"
+              },
+              {
+                "rotulo": "Vale Cargas",
+                "valor": "R$ 8.750",
+                "detalhe": "10/11",
+                "status": "ok"
+              }
+            ],
+            "serie": [],
+            "colunas": [
+              "Cliente",
+              "Valor",
+              "Vencimento",
+              "Situação"
+            ],
+            "botao": ""
+          },
+          {
+            "id": "fechou",
+            "tipo": "notificacao",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "Fechamento do mês pronto",
+            "texto": "Contas a pagar, a receber e cobrança conferidas.",
+            "icone": "check",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          }
+        ],
+        "acoes": [
+          {
+            "alvo": "atraso",
+            "acao": "destacar",
+            "texto": ""
+          },
+          {
+            "alvo": "cobrancas",
+            "acao": "zoom",
+            "texto": ""
+          },
+          {
+            "alvo": "fechou",
+            "acao": "notificar",
+            "texto": ""
+          }
+        ],
+        "narracao": "Você vê quem está devendo e quanto entra no mês. E o fechamento sai do próprio sistema."
+      },
+      {
+        "tipo": "interface",
+        "segundos": 7,
+        "fundo": "escuro",
+        "cor": "secundaria",
+        "titulo": "Equipe na rua, **sistema no bolso**",
+        "moldura": "celular",
+        "endereco": "",
+        "tela": "F-Mobile",
+        "menu": [],
+        "blocos": [
+          {
+            "id": "viagem",
+            "tipo": "cartao",
+            "largura": 12,
+            "altura": 1,
+            "titulo": "Viagem em andamento",
+            "texto": "Coleta concluída, seguindo para a entrega.",
+            "icone": "truck",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "lancar",
+            "tipo": "formulario",
+            "largura": 12,
+            "altura": 3,
+            "titulo": "Lançar despesa da viagem",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Tipo",
+                "valor": "Pedágio",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Valor",
+                "valor": "R$ 38,90",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Observação",
+                "valor": "Praça de pedágio na rodovia",
+                "detalhe": "",
+                "status": "neutro"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": "Salvar lançamento"
+          },
+          {
+            "id": "salvo",
+            "tipo": "notificacao",
+            "largura": 4,
+            "altura": 1,
+            "titulo": "Lançamento salvo",
+            "texto": "Já aparece no financeiro do escritório.",
+            "icone": "check",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "ok",
+            "itens": [],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          }
+        ],
+        "acoes": [
+          {
+            "alvo": "lancar",
+            "acao": "digitar",
+            "texto": "R$ 38,90"
+          },
+          {
+            "alvo": "lancar",
+            "acao": "clicar",
+            "texto": ""
+          },
+          {
+            "alvo": "salvo",
+            "acao": "notificar",
+            "texto": ""
+          }
+        ],
+        "narracao": "Com o Éfe Mobile, quem está na rua consulta e lança pelo celular, sem depender do escritório."
+      },
+      {
+        "tipo": "interface",
+        "segundos": 8,
+        "fundo": "claro",
+        "cor": "destaque",
+        "titulo": "WhatsApp **pelo número da empresa**",
+        "moldura": "navegador",
+        "endereco": "frenty.app/mensageria",
+        "tela": "Mensageria",
+        "menu": [
+          {
+            "rotulo": "Painel",
+            "icone": "home"
+          },
+          {
+            "rotulo": "Transportes",
+            "icone": "truck"
+          },
+          {
+            "rotulo": "Financeiro",
+            "icone": "wallet"
+          },
+          {
+            "rotulo": "CRM",
+            "icone": "users"
+          },
+          {
+            "rotulo": "Mensageria",
+            "icone": "chat"
+          }
+        ],
+        "blocos": [
+          {
+            "id": "saldo",
+            "tipo": "progresso",
+            "largura": 5,
+            "altura": 2,
+            "titulo": "Números de Disparos",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Usadas no ciclo: 420 de 1.500",
+                "valor": "28%",
+                "detalhe": "",
+                "status": "ok"
+              },
+              {
+                "rotulo": "Número comercial",
+                "valor": "18%",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Número financeiro",
+                "valor": "10%",
+                "detalhe": "",
+                "status": "neutro"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "analise",
+            "tipo": "grafico",
+            "largura": 7,
+            "altura": 2,
+            "titulo": "Análise de disparos",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "area",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Seg",
+                "valor": "62",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Ter",
+                "valor": "88",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Qua",
+                "valor": "74",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Qui",
+                "valor": "96",
+                "detalhe": "",
+                "status": "neutro"
+              },
+              {
+                "rotulo": "Sex",
+                "valor": "100",
+                "detalhe": "",
+                "status": "neutro"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          },
+          {
+            "id": "numeros",
+            "tipo": "lista",
+            "largura": 12,
+            "altura": 2,
+            "titulo": "WhatsApp número disparo ERP",
+            "texto": "",
+            "icone": "",
+            "valor": "",
+            "variacao": "",
+            "tendencia": "neutra",
+            "variante": "barras",
+            "status": "neutro",
+            "itens": [
+              {
+                "rotulo": "Número comercial",
+                "valor": "Conectado",
+                "detalhe": "Envios da equipe comercial",
+                "status": "ok"
+              },
+              {
+                "rotulo": "Número financeiro",
+                "valor": "Conectado",
+                "detalhe": "Avisos e cobranças",
+                "status": "ok"
+              }
+            ],
+            "serie": [],
+            "colunas": [],
+            "botao": ""
+          }
+        ],
+        "acoes": [
+          {
+            "alvo": "saldo",
+            "acao": "destacar",
+            "texto": ""
+          },
+          {
+            "alvo": "numeros",
+            "acao": "zoom",
+            "texto": ""
+          }
+        ],
+        "narracao": "E o WhatsApp sai pelo número da empresa: mil e quinhentas mensagens por ciclo, com análise de cada disparo."
+      },
+      {
+        "tipo": "numero_destaque",
+        "segundos": 6.5,
+        "fundo": "cor",
+        "cor": "destaque",
+        "valor": "R$ 549",
+        "rotulo": "por mês, tudo incluído",
+        "contexto": "Até 10 usuários e 500 notas fiscais por mês",
+        "tendencia": "neutra",
+        "icone": "tag",
+        "narracao": "Tudo isso por quinhentos e quarenta e nove reais por mês, para até dez usuários."
+      },
+      {
+        "tipo": "chamada",
+        "segundos": 5.5,
+        "titulo": "Contrate online, **só com CNPJ e WhatsApp**",
+        "texto": "Sem vendedor no meio. Ou agende uma demonstração.",
+        "botao": "Contratar agora",
+        "url": "frenty.com.br/p/frenty-transportes-plus",
+        "narracao": "Contrate online, só com cê-ene-pê-jota e WhatsApp. Sem vendedor no meio."
+      },
+      {
+        "tipo": "encerramento",
+        "segundos": 5,
+        "slogan": "Operação, financeiro e WhatsApp num ERP só.",
+        "url": "frenty.com.br",
+        "narracao": "Frenty Transportes Plus. Operação, financeiro e WhatsApp num é erre pê só."
+      }
+    ]
+  }
+}

@@ -15,8 +15,10 @@ const plain = (s?: string) =>
     .trim();
 const join = (...parts: (string | undefined)[]) => parts.map(plain).filter(Boolean).join('. ');
 
-// O que a voz lê em cada tipo de cena: o texto visível, na ordem em que aparece na tela.
+// O que a voz lê em cada tipo de cena: o texto de narração escrito para ela ou, sem ele, o texto visível,
+// na ordem em que aparece na tela.
 export function narrationText(scene: Scene): string {
+  if (plain(scene.narration)) return plain(scene.narration);
   switch (scene.type) {
     case 'intro':
       return join(scene.title, scene.subtitle);

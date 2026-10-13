@@ -262,6 +262,13 @@ type Report = (msg: string) => void;
 const quiet: Report = () => undefined;
 
 export function toScene(p: PlanScene, custom: Set<string>, report: Report = quiet): Scene | null {
+  const scene = convert(p, custom, report);
+  // Narração escrita à mão para a cena (opcional; a IA não preenche este campo).
+  const narration = text((p as { narracao?: unknown }).narracao, 600);
+  return scene && narration ? { ...scene, narration } : scene;
+}
+
+function convert(p: PlanScene, custom: Set<string>, report: Report): Scene | null {
   const surface = pick((p as { fundo?: string }).fundo, FUNDOS, 'claro');
   const tint = pick((p as { cor?: string }).cor, CORES, 'primaria');
   switch (p.tipo) {

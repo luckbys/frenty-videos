@@ -50,7 +50,7 @@ export type UiActionKind = 'clicar' | 'digitar' | 'destacar' | 'zoom' | 'notific
 export type UiAction = { target: string; kind: UiActionKind; text?: string };
 export type UiFrameKind = 'navegador' | 'app' | 'celular';
 
-export type Scene =
+export type Scene = (
   | { type: 'intro'; title: string; subtitle?: string; frames: number }
   | { type: 'text'; title?: string; body: string; frames: number }
   | { type: 'bullets'; title?: string; items: string[]; icons?: string[]; frames: number }
@@ -79,7 +79,11 @@ export type Scene =
       surface: Surface;
       tint: Tint;
       frames: number;
-    };
+    }
+) & {
+  // Texto que a voz lê nesta cena, quando o roteiro traz um próprio; sem ele, a voz lê o que está na tela.
+  narration?: string;
+};
 
 // Ícone desenhado pela IA: traços num quadro de 24×24, como os ícones de linha da marca.
 export type CustomIcon = { name: string; paths: string[] };

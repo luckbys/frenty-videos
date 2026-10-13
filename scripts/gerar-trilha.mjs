@@ -2,6 +2,8 @@
 // Tudo gerado aqui (sem samples de terceiros): tensão no começo, impacto na entrada da logo (10,8 s),
 // groove leve e otimista no meio e um acorde final no encerramento (55,4 s).
 // Uso: node scripts/gerar-trilha.mjs  (o MP3 sai pelo ffmpeg que vem com o Remotion)
+// Outras trilhas no mesmo padrão (os pontos de virada são os mesmos):
+//   node scripts/gerar-trilha.mjs --saida public/comerciais/trilha-lote-validade.mp3 --tom 2 --semente 29
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -15,9 +17,15 @@ const R = new Float32Array(N);
 const send = new Float32Array(N); // envio para o reverb
 const duck = new Float32Array(N).fill(1); // "sidechain" do bumbo
 
-let seed = 11;
+const opcao = (nome, padrao) => {
+  const i = process.argv.indexOf(`--${nome}`);
+  return i > 0 && process.argv[i + 1] !== undefined ? process.argv[i + 1] : padrao;
+};
+const SAIDA = opcao('saida', 'public/comerciais/trilha-modulo-os.mp3');
+const TOM = Number(opcao('tom', 0)); // transposição em semitons
+let seed = Number(opcao('semente', 11));
 const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296) * 2 - 1;
-const mtof = (m) => 440 * 2 ** ((m - 69) / 12);
+const mtof = (m) => 440 * 2 ** ((m + TOM - 69) / 12);
 const BPM = 110;
 const BEAT = 60 / BPM;
 const BAR = BEAT * 4;
@@ -332,8 +340,8 @@ for (let n = 0; n < N; n++) {
   buf.writeInt16LE(Math.round(L[n] * gain * 32767), 44 + n * 4);
   buf.writeInt16LE(Math.round(R[n] * gain * 32767), 46 + n * 4);
 }
-const wav = path.join(os.tmpdir(), `trilha-modulo-os-${process.pid}.wav`);
-const mp3 = 'public/comerciais/trilha-modulo-os.mp3';
+const wav = path.join(os.tmpdir(), `trilha-${process.pid}.wav`);
+const mp3 = SAIDA;
 fs.writeFileSync(wav, buf);
 fs.mkdirSync(path.dirname(mp3), { recursive: true });
 try {

@@ -247,6 +247,12 @@ Peças feitas à mão (fora do gerador por .md), com a identidade oficial e cena
   sintetizada por `node scripts/gerar-trilha.mjs`; a narração entra pela prop `vozes` (um áudio por
   cena, na ordem do roteiro), e a trilha abaixa sozinha quando há voz. Para conferir quadros soltos:
   `npx tsx scripts/quadros.ts ComercialModuloOS pasta 120 480 900`.
+- **Gerenciador de Lote e Validade** (9:16, 60 s), em `src/comerciais/lote-validade/`:
+  `npx remotion render src/index.ts ComercialLoteValidade saida/frenty-lote-validade.mp4`.
+  Mesmo padrão e mesma estrutura do comercial de O.S. (usa o kit e as cenas de integração, chamada e
+  final dele); as peças próprias (estante, etiqueta de lote, impressora, leitor, calendário, sino,
+  carrinho, cofrinho, fábrica, armazém, loja e caminhão) ficam em `ilustracoes.tsx`. Trilha própria:
+  `node scripts/gerar-trilha.mjs --saida public/comerciais/trilha-lote-validade.mp3 --tom 2 --semente 29`.
 
 ## Estrutura
 

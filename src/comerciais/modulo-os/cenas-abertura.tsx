@@ -13,7 +13,7 @@ const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
 /* ---------- Cena 1: o caos ---------- */
 
-const SWEEP = 100; // quadro em que a barra ciana varre a tela
+export const SWEEP = 100; // quadro em que a barra ciana varre a tela
 
 // Rabiscos de caneta (linhas onduladas) para preencher os papéis.
 const Scribble: React.FC<{ w: number; seed: number; color?: string }> = ({ w, seed, color = '#2B4C9B' }) => {
@@ -192,7 +192,7 @@ const STREAKS = [
   { y: 1560, h: 56, d: 3, c: 'rgba(255,255,255,0.4)' },
   { y: 1740, h: 40, d: 6, c: K.cyan },
 ];
-const Streaks: React.FC = () => {
+export const Streaks: React.FC = () => {
   const frame = useCurrentFrame();
   const flash = interpolate(frame, [SWEEP, SWEEP + 4, SWEEP + 16], [0, 0.18, 0], clamp);
   return (
@@ -224,12 +224,12 @@ const Streaks: React.FC = () => {
 
 // Os jeitos antigos, riscados um a um.
 const OLD_WAYS = ['Papel', 'Planilha', 'Grupo de WhatsApp'];
-const OldWays: React.FC<{ at: number }> = ({ at }) => {
+export const OldWays: React.FC<{ at: number; itens?: string[] }> = ({ at, itens = OLD_WAYS }) => {
   const frame = useCurrentFrame();
   const sp = useSpring();
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, width: 900 }}>
-      {OLD_WAYS.map((w, i) => {
+      {itens.map((w, i) => {
         const p = sp(at + i * 6, SPRING.bouncy);
         const strike = tween(frame, at + 14 + i * 6, 10, EASE.out);
         return (

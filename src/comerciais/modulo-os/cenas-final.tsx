@@ -137,7 +137,8 @@ export const CenaBeneficios: React.FC = () => {
 
 /* ---------- Cena 8: integração ---------- */
 
-const NODES = [
+type No = { icon: string; t: string; a: number };
+const NODES: No[] = [
   { icon: 'users', t: 'CRM', a: -142 },
   { icon: 'layers', t: 'ERP', a: -38 },
   { icon: 'bolt', t: 'Automações', a: 142 },
@@ -146,7 +147,13 @@ const NODES = [
 const HUB = { x: 540, y: 1040 };
 const RADIUS = 340;
 
-export const CenaIntegracao: React.FC = () => {
+// Os textos e os nós podem ser trocados para reaproveitar a cena em outros comerciais.
+export const CenaIntegracao: React.FC<{ titulo?: string; tamanhoTitulo?: number; nos?: No[]; selos?: string[] }> = ({
+  titulo = 'Integre e\n**automatize**',
+  tamanhoTitulo = 128,
+  nos = NODES,
+  selos = ['Tarefas automáticas', 'Resposta mais rápida'],
+}) => {
   const frame = useCurrentFrame();
   const sp = useSpring();
   const pulse = (frame % 40) / 40;
@@ -154,7 +161,7 @@ export const CenaIntegracao: React.FC = () => {
     <Bg focus={[50, 55]}>
       <Push from={1} to={1.04} origin="50% 55%">
         <svg width={1080} height={1920} style={{ position: 'absolute', inset: 0 }}>
-          {NODES.map((n, i) => {
+          {nos.map((n, i) => {
             const rad = (n.a * Math.PI) / 180;
             const x1 = HUB.x + Math.cos(rad) * 150;
             const y1 = HUB.y + Math.sin(rad) * 150;
@@ -197,7 +204,7 @@ export const CenaIntegracao: React.FC = () => {
         <div style={{ position: 'absolute', left: HUB.x - 130, top: HUB.y - 130, filter: `drop-shadow(0 0 40px ${alpha(K.cyan, 0.45)})` }}>
           <FrentyLogo height={260} parte="simbolo" delay={6} />
         </div>
-        {NODES.map((n, i) => {
+        {nos.map((n, i) => {
           const rad = (n.a * Math.PI) / 180;
           const x = HUB.x + Math.cos(rad) * RADIUS;
           const y = HUB.y + Math.sin(rad) * RADIUS;
@@ -212,7 +219,7 @@ export const CenaIntegracao: React.FC = () => {
           );
         })}
         <Fade at={96} style={{ position: 'absolute', left: M, right: M, top: 1560, display: 'flex', gap: 20, justifyContent: 'center' }}>
-          {['Tarefas automáticas', 'Resposta mais rápida'].map((t) => (
+          {selos.map((t) => (
             <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 12, background: K.white, color: K.ink, borderRadius: 999, padding: '18px 26px', fontSize: 30, fontWeight: 900, boxShadow: '0 18px 40px rgba(16,6,48,0.4)' }}>
               <LineIcon name="check" size={32} color={K.green} strokeWidth={3} />
               {t}
@@ -221,11 +228,11 @@ export const CenaIntegracao: React.FC = () => {
         </Fade>
       </Push>
       <div style={{ position: 'absolute', left: M, top: 170 }}>
-        <Title text={'Integre e\n**automatize**'} at={2} size={128} />
+        <Title text={titulo} at={2} size={tamanhoTitulo} />
       </div>
       <Sfx name="whoosh" at={2} volume={0.25} />
       <Sfx name="chime" at={14} volume={0.22} />
-      {NODES.map((_, i) => (
+      {nos.map((_, i) => (
         <Sfx key={i} name="pop" at={28 + i * 6} volume={0.24} />
       ))}
       <Sfx name="pop" at={98} volume={0.25} />
@@ -265,7 +272,7 @@ const Faixa: React.FC<{ itens: string[]; top: number; dir: 1 | -1; at: number }>
   );
 };
 
-export const CenaChamada: React.FC = () => {
+export const CenaChamada: React.FC<{ faixas?: string[][] }> = ({ faixas = FAIXAS }) => {
   const frame = useCurrentFrame();
   const sp = useSpring();
   const btn = sp(60, SPRING.bouncy);
@@ -322,8 +329,8 @@ export const CenaChamada: React.FC = () => {
       <div style={{ position: 'absolute', left: 0, right: 0, top: 1300, textAlign: 'center', fontSize: 42, fontWeight: 800, color: alpha(K.white, 0.9), letterSpacing: 1 }}>
         <Typed text="frenty.com.br" at={TAP9 + 8} cps={20} />
       </div>
-      <Faixa itens={FAIXAS[0]} top={1470} dir={-1} at={38} />
-      <Faixa itens={FAIXAS[1]} top={1578} dir={1} at={44} />
+      <Faixa itens={faixas[0]} top={1470} dir={-1} at={38} />
+      <Faixa itens={faixas[1]} top={1578} dir={1} at={44} />
       <Sfx name="whoosh" at={4} volume={0.25} />
       <Sfx name="pop" at={62} volume={0.32} />
       <Sfx name="click" at={TAP9 - 1} volume={0.55} />
